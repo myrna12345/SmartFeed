@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Sudut membulat -->
+    <corners android:radius="50dp"/> <!-- Meningkatkan radius agar lebih membulat -->
+
+    <!-- Warna latar tombol -->
+    <solid android:color="@color/blue"/> <!-- Pastikan ini mengacu pada warna biru yang benar -->
+
+    <!-- Tambahkan efek bayangan atau border -->
+    <stroke android:width="2dp" android:color="@color/blue"/> <!-- Opsional, jika ingin border -->
+
+    <padding android:left="10dp" android:right="10dp"/>
+</shape>

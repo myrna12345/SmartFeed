@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@android:color/white"
+    android:padding="20dp">
+
+    <!-- Image View for Logo -->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/logo" />
+
+    <!-- Nama Aplikasi -->
+    <TextView
+        android:id="@+id/tv_app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SmartFeed"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="30dp"/>
+
+    <!-- Tombol Mulai -->
+    <Button
+        android:id="@+id/btn_mulai"
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Mulai"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/button_rounded"/>
+
+    <!-- Indicator -->
+    <ImageView
+        android:id="@+id/indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/indicator_active"
+        android:contentDescription="Indicator"/>
+
+</LinearLayout>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#000000</color> <!-- Hitam solid -->
+    <color name="white">#FFFFFF</color> <!-- Putih solid -->
+    <color name="blue">#3293c8</color> <!-- Cornflower Blue -->
+    <color name="green">#00FF00</color> <!-- Warna hijau yang benar -->
+</resources>
