@@ -12,18 +12,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PakanOtomatis"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ActivityLogin"
+            android:exported="false" />
         <!-- Splash Screen -->
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/Theme.PakanOtomatis"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.PakanOtomatis">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>
