@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#F8F8F8"
+    android:gravity="center_horizontal">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D6F0FF"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:elevation="4dp">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_user"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Hai, Azmi!"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_check_feed" />
+    </LinearLayout>
+
+    <!-- Logo dan persentase pakan -->
+
+    <FrameLayout
+
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="16dp">
+
+
+
+        <!-- Progress melingkar -->
+        <ProgressBar
+            android:id="@+id/progress_pakan"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="20"
+            android:progressDrawable="@drawable/circular_progress_blue" />
+    </FrameLayout>
+
+    <!-- Persentase -->
+    <TextView
+        android:id="@+id/tv_persen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20%"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="⚠ Sisa Pakan Ikan"
+        android:textSize="14sp"
+        android:textColor="#333333"
+        android:layout_marginBottom="20dp" />
+
+    <!-- Tombol Atur Jadwal -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginVertical="8dp"
+        android:text="Atur Jadwal"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#0D9AFF"
+        android:drawableStart="@drawable/tanggal"
+        android:paddingStart="16dp" />
+
+    <!-- Tombol Lihat Jadwal -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginVertical="8dp"
+        android:text="Lihat Jadwal"
+        android:textColor="@android:color/black"
+        android:backgroundTint="#0D9AFF"
+        android:drawableStart="@drawable/ic_list"
+        android:paddingStart="16dp" />
+
+    <!-- Tombol Jadwal yang akan datang -->
+    <Button
+        android:id="@+id/btn_next_schedule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#0D9AFF"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:drawableStart="@drawable/ic_calendar"
+        android:paddingStart="16dp"
+        android:text="Jadwal yang akan datang:\n12:00" />
+
+</LinearLayout>

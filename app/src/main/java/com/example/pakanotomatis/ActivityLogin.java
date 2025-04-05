@@ -37,9 +37,10 @@ public class ActivityLogin extends AppCompatActivity {
         btnLogin.setOnClickListener(view -> validateLogin());
 
         // Menangani aksi lupa password
-        tvForgotPassword.setOnClickListener(view ->
-                Toast.makeText(ActivityLogin.this, "Fitur lupa kata sandi belum tersedia", Toast.LENGTH_SHORT).show()
-        );
+        tvForgotPassword.setOnClickListener(view -> {
+            Intent intent = new Intent(ActivityLogin.this, LupaKataSandiActivity.class);
+            startActivity(intent);
+        });
 
         // Menangani toggle password visibility
         ivTogglePassword.setOnClickListener(view -> togglePasswordVisibility());
@@ -60,17 +61,22 @@ public class ActivityLogin extends AppCompatActivity {
             return;
         }
 
+        if (!email.contains("@")) {
+            etEmail.setError("Email harus mengandung simbol '@'");
+            etEmail.requestFocus();
+            return;
+        }
+
         if (password.isEmpty()) {
             etPassword.setError("Kata sandi tidak boleh kosong");
             etPassword.requestFocus();
             return;
         }
 
-        // Login sukses (dummy login)
         Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
 
-        // Pindah ke halaman utama (ganti MainActivity dengan activity tujuan)
-        Intent intent = new Intent(ActivityLogin.this, SplashActivity.class);
+        // Pindah ke halaman utama (ubah jika ada halaman lain)
+        Intent intent = new Intent(ActivityLogin.this, DashboardActivity.class); // ganti MainActivity jika perlu
         startActivity(intent);
         finish();
     }
@@ -84,7 +90,7 @@ public class ActivityLogin extends AppCompatActivity {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
             ivTogglePassword.setImageResource(R.drawable.ic_eye_closed);
         }
-        etPassword.setSelection(etPassword.getText().length()); // Posisikan kursor di akhir teks
+        etPassword.setSelection(etPassword.getText().length());
         isPasswordVisible = !isPasswordVisible;
     }
 
