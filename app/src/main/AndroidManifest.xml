@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.pakanotomatis">
 
     <application
         android:allowBackup="true"
@@ -12,26 +13,43 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PakanOtomatis"
         tools:targetApi="31">
+
+        <!-- Activity Dashboard -->
         <activity
             android:name=".DashboardActivity"
-            android:exported="false" />
-        <!-- Tambahkan LupaPasswordActivity di sini -->
+            android:exported="true" /> <!-- Tambahkan exported="true" jika ingin Activity ini diakses dari luar -->
+
+        <!-- Activity Lupa Password -->
         <activity
             android:name=".LupaKataSandiActivity"
-            android:exported="false" /> <!-- Login Activity -->
+            android:exported="false" />
+
+        <!-- Activity Login -->
         <activity
             android:name=".ActivityLogin"
-            android:exported="false" /> <!-- Splash Screen Activity -->
+            android:exported="false" />
+
+        <!-- Splash Screen -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.PakanOtomatis">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Activity Atur Jadwal -->
+        <activity
+            android:name=".AturJadwalActivity"
+            android:exported="true" />
+
+        <!-- Activity Lihat Jadwal -->
+        <activity
+            android:name=".LihatJadwalActivity"
+            android:exported="true" />
+
     </application>
 
 </manifest>
