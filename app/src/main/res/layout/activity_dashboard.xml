@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -41,17 +42,15 @@
             android:src="@drawable/ic_check_feed" />
     </LinearLayout>
 
-    <!-- Logo dan persentase pakan -->
-
+    <!-- Logo dan progress pakan -->
     <FrameLayout
-
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        tools:ignore="ExtraText">
 
 
-
-        <!-- Progress melingkar -->
+        <!-- Progress -->
         <ProgressBar
             android:id="@+id/progress_pakan"
             style="?android:attr/progressBarStyleHorizontal"
@@ -61,7 +60,25 @@
             android:max="100"
             android:progress="20"
             android:progressDrawable="@drawable/circular_progress_blue" />
+        <!-- Logo di tengah -->
+        <ImageView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/logo"
+            android:scaleType="centerInside"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:elevation="4dp"
+            android:layout_gravity="center"
+            android:clipToOutline="true"
+            android:outlineProvider="background" />
+
+
     </FrameLayout>
+
 
     <!-- Persentase -->
     <TextView
@@ -90,7 +107,8 @@
         android:textColor="@android:color/black"
         android:backgroundTint="#0D9AFF"
         android:drawableStart="@drawable/tanggal"
-        android:paddingStart="16dp" />
+        android:drawablePadding="16dp"
+        android:paddingStart="16dp"/>
 
     <!-- Tombol Lihat Jadwal -->
     <Button
@@ -103,7 +121,7 @@
         android:drawableStart="@drawable/ic_list"
         android:paddingStart="16dp" />
 
-    <!-- Tombol Jadwal yang akan datang -->
+    <!-- Tombol Jadwal Berikutnya -->
     <Button
         android:id="@+id/btn_next_schedule"
         android:layout_width="match_parent"
@@ -116,5 +134,6 @@
         android:drawableStart="@drawable/ic_calendar"
         android:paddingStart="16dp"
         android:text="Jadwal yang akan datang:\n12:00" />
+
 
 </LinearLayout>
