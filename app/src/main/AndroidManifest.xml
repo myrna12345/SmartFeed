@@ -13,43 +13,38 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PakanOtomatis"
         tools:targetApi="31">
-
-        <!-- Activity Dashboard -->
+        <activity
+            android:name=".LihatprofilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Edit_profil"
+            android:exported="false" /> <!-- Activity Dashboard -->
         <activity
             android:name=".DashboardActivity"
             android:exported="true" /> <!-- Tambahkan exported="true" jika ingin Activity ini diakses dari luar -->
-
         <!-- Activity Lupa Password -->
         <activity
             android:name=".LupaKataSandiActivity"
-            android:exported="false" />
-
-        <!-- Activity Login -->
+            android:exported="false" /> <!-- Activity Login -->
         <activity
             android:name=".ActivityLogin"
-            android:exported="false" />
-
-        <!-- Splash Screen -->
+            android:exported="false" /> <!-- Splash Screen -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.PakanOtomatis">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Activity Atur Jadwal -->
+        </activity> <!-- Activity Atur Jadwal -->
         <activity
             android:name=".AturJadwalActivity"
-            android:exported="true" />
-
-        <!-- Activity Lihat Jadwal -->
+            android:exported="true" /> <!-- Activity Lihat Jadwal -->
         <activity
             android:name=".LihatJadwalActivity"
             android:exported="true" />
-
     </application>
 
 </manifest>
