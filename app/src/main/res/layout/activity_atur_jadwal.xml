@@ -10,8 +10,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Kembali"
-        android:backgroundTint="#0D9AFF"
-        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:backgroundTint="#BDE5FF"
+        android:textColor="@android:color/black"
         android:layout_margin="16dp"/>
 
     <EditText
@@ -23,6 +24,9 @@
     <Button
         android:id="@+id/btnPilihJam"
         android:text="Pilih Jam"
+        android:textStyle="bold"
+        android:backgroundTint="#BDE5FF"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
@@ -30,6 +34,7 @@
     <TextView
         android:id="@+id/txtJam"
         android:text="00:00"
+        android:textStyle="bold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="18sp"
@@ -38,6 +43,9 @@
     <Button
         android:id="@+id/btnSimpan"
         android:text="Simpan Jadwal"
+        android:textStyle="bold"
+        android:backgroundTint="#BDE5FF"
+        android:textColor="@android:color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp" />

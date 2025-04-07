@@ -26,13 +26,18 @@
             android:layout_marginEnd="12dp"/>
 
         <TextView
+            android:id="@+id/tvNamaPengguna"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Hai, Azmi!"
             android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground" />
+
 
         <ImageView
             android:layout_width="24dp"
@@ -99,8 +104,9 @@
         android:layout_height="50dp"
         android:layout_marginVertical="8dp"
         android:text="Atur Jadwal"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:backgroundTint="#0D9AFF"
+        android:backgroundTint="#BDE5FF"
         android:drawableStart="@drawable/tanggal"
         android:drawablePadding="16dp"
         android:paddingStart="16dp"/>
@@ -112,8 +118,9 @@
         android:layout_height="50dp"
         android:layout_marginVertical="8dp"
         android:text="Lihat Jadwal"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
-        android:backgroundTint="#0D9AFF"
+        android:backgroundTint="#BDE5FF"
         android:drawableStart="@drawable/ic_list"
         android:paddingStart="16dp" />
 
@@ -123,7 +130,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:backgroundTint="#0D9AFF"
+        android:backgroundTint="#BDE5FF"
         android:textColor="@android:color/black"
         android:textStyle="bold"
         android:textSize="14sp"

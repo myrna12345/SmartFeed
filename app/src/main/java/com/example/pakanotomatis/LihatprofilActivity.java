@@ -1,6 +1,7 @@
 package com.example.pakanotomatis;
 
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,10 @@ public class LihatprofilActivity extends AppCompatActivity {
         textNama = findViewById(R.id.text_nama);
         textEmail = findViewById(R.id.text_email);
         textPhone = findViewById(R.id.text_phone);
+
+        // Inisialisasi tombol kembali
+        ImageView btnKembali = findViewById(R.id.btnKembali);
+        btnKembali.setOnClickListener(v -> finish());
 
         // Ambil data dari Intent
         String nama = getIntent().getStringExtra("nama");

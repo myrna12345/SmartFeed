@@ -37,10 +37,12 @@ public class DashboardActivity extends AppCompatActivity {
         btnNextSchedule.setText("Jadwal yang akan datang:\n12:00");
 
         // Menangani tombol Atur Jadwal
-        btnAturJadwal.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, AturJadwalActivity.class);
+        TextView tvNamaPengguna = findViewById(R.id.tvNamaPengguna);
+        tvNamaPengguna.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class);
             startActivity(intent);
         });
+
 
         // Menangani tombol Lihat Jadwal
         btnLihatJadwal.setOnClickListener(v -> {
