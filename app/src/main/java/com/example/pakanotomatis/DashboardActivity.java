@@ -12,7 +12,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private ProgressBar progressBarPakan;
     private TextView tvPersen;
-    private Button btnAturJadwal, btnLihatJadwal, btnNextSchedule; // Tambahkan tombol Atur Jadwal dan Lihat Jadwal
+    private Button btnAturJadwal, btnLihatJadwal, btnNextSchedule;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +22,9 @@ public class DashboardActivity extends AppCompatActivity {
         // Inisialisasi komponen UI
         progressBarPakan = findViewById(R.id.progress_pakan);
         tvPersen = findViewById(R.id.tv_persen);
-        btnAturJadwal = findViewById(R.id.btnAturJadwal); // Tombol Atur Jadwal
-        btnLihatJadwal = findViewById(R.id.btnLihatJadwal); // Tombol Lihat Jadwal
-        btnNextSchedule = findViewById(R.id.btn_next_schedule); // Tombol Jadwal Berikutnya
+        btnAturJadwal = findViewById(R.id.btnAturJadwal);
+        btnLihatJadwal = findViewById(R.id.btnLihatJadwal);
+        btnNextSchedule = findViewById(R.id.btn_next_schedule);
 
         // Ambil data dari sensor (sementara dummy)
         int sisaPakanPersen = getSensorData();
@@ -33,18 +33,16 @@ public class DashboardActivity extends AppCompatActivity {
         progressBarPakan.setProgress(sisaPakanPersen);
         tvPersen.setText(sisaPakanPersen + " %");
 
-        // Update tombol jadwal berikutnya (pakai teks multiline)
+        // Update tombol jadwal berikutnya
         btnNextSchedule.setText("Jadwal yang akan datang:\n12:00");
 
-        // Menangani tombol Atur Jadwal
-        TextView tvNamaPengguna = findViewById(R.id.tvNamaPengguna);
-        tvNamaPengguna.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class);
+        // Event tombol Atur Jadwal
+        btnAturJadwal.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, AturJadwalActivity.class);
             startActivity(intent);
         });
 
-
-        // Menangani tombol Lihat Jadwal
+        // Event tombol Lihat Jadwal
         btnLihatJadwal.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, LihatJadwalActivity.class);
             startActivity(intent);
@@ -53,7 +51,6 @@ public class DashboardActivity extends AppCompatActivity {
 
     // Dummy method untuk ambil data sensor
     private int getSensorData() {
-        // Di sini nanti kamu bisa ambil dari Firebase, REST API, dsb
-        return 20; // contoh: 20% sisa pakan
+        return 20;
     }
 }
