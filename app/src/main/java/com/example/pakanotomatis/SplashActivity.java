@@ -3,27 +3,30 @@ package com.example.pakanotomatis;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.Button;
+import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
+
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        Button btnMulai = findViewById(R.id.btn_mulai);
+        // Inisialisasi ProgressBar
+        progressBar = findViewById(R.id.progressBar);
 
-        // Tombol untuk pindah ke halaman login
-        btnMulai.setOnClickListener(new View.OnClickListener() {
+        // Menunggu selama 3 detik dan kemudian pindah ke Login Activity
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onClick(View v) {
+            public void run() {
+                // Pindah ke ActivityLogin setelah delay
                 Intent intent = new Intent(SplashActivity.this, ActivityLogin.class);
                 startActivity(intent);
-                finish();
+                finish();  // Pastikan splash screen tidak bisa kembali
             }
-        });
+        }, 3000);  // Waktu delay 3 detik
     }
 }
