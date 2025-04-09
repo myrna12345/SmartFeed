@@ -1,11 +1,18 @@
 package com.example.pakanotomatis;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,49 +25,113 @@ public class LihatJadwalActivity extends AppCompatActivity {
     JadwalAdapter adapter;
     DatabaseHelper db;
     ArrayList<Jadwal> daftarJadwal;
-    Button btnKembaliLihatJadwal;  // Tombol Kembali
+    ImageView btnKembali;
+    TextView tvKosong; // Tambahkan variabel untuk TextView jadwal kosong
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lihat_jadwal);
 
-        // Inisialisasi komponen UI
+        // Inisialisasi View
         recyclerView = findViewById(R.id.recyclerViewJadwal);
-        btnKembaliLihatJadwal = findViewById(R.id.btnKembaliLihatJadwal);  // Tombol Kembali
+        btnKembali = findViewById(R.id.btnKembali);
+        tvKosong = findViewById(R.id.tvKosong); // Inisialisasi TextView
 
+        // Inisialisasi database dan data
         db = new DatabaseHelper(this);
-
-        // Ambil semua jadwal dari database
         daftarJadwal = db.getAllJadwal();
-        adapter = new JadwalAdapter(daftarJadwal, this, new JadwalAdapter.OnDeleteListener() {
-            @Override
-            public void onDelete(int position) {
-                // Konfirmasi penghapusan jadwal
-                new AlertDialog.Builder(LihatJadwalActivity.this)
-                        .setTitle("Konfirmasi")
-                        .setMessage("Apakah Anda yakin ingin menghapus jadwal ini?")
-                        .setPositiveButton("Ya", (dialog, which) -> {
-                            // Hapus jadwal dari database dan update RecyclerView
-                            db.deleteJadwal(daftarJadwal.get(position).getId());
-                            daftarJadwal.remove(position);
-                            adapter.notifyItemRemoved(position);
-                            Toast.makeText(LihatJadwalActivity.this, "Jadwal dihapus", Toast.LENGTH_SHORT).show();
-                        })
-                        .setNegativeButton("Tidak", (dialog, which) -> {
-                            dialog.dismiss();
-                        })
-                        .show();
-            }
-        });
 
-        // Set RecyclerView
+        // Tampilkan/hidden berdasarkan data
+        if (daftarJadwal.isEmpty()) {
+            tvKosong.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            tvKosong.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
+
+        // Atur RecyclerView
+        adapter = new JadwalAdapter(this, daftarJadwal);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Tombol Kembali - Kembali ke Activity sebelumnya
-        btnKembaliLihatJadwal.setOnClickListener(v -> {
-            onBackPressed();  // Fungsi untuk kembali ke activity sebelumnya
+        // Fungsi klik tombol panah kembali
+        btnKembali.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // kembali ke activity sebelumnya
+            }
         });
+    }
+
+    // ============================================
+    // Inner Class Adapter RecyclerView
+    // ============================================
+    public class JadwalAdapter extends RecyclerView.Adapter<JadwalAdapter.ViewHolder> {
+
+        Context context;
+        ArrayList<Jadwal> listJadwal;
+
+        public JadwalAdapter(Context context, ArrayList<Jadwal> listJadwal) {
+            this.context = context;
+            this.listJadwal = listJadwal;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_jadwal, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Jadwal jadwal = listJadwal.get(position);
+            holder.txtJudul.setText(jadwal.getJudul());
+            holder.txtJam.setText(jadwal.getJam());
+
+            holder.btnDelete.setOnClickListener(v -> {
+                new AlertDialog.Builder(context)
+                        .setTitle("Konfirmasi")
+                        .setMessage("Apakah Anda yakin ingin menghapus jadwal ini?")
+                        .setPositiveButton("Ya", (dialog, which) -> {
+                            db.deleteJadwal(jadwal.getId());
+                            listJadwal.remove(position);
+                            notifyItemRemoved(position);
+                            Toast.makeText(context, "Jadwal dihapus", Toast.LENGTH_SHORT).show();
+
+                            // Perbarui tampilan jika kosong
+                            if (listJadwal.isEmpty()) {
+                                tvKosong.setVisibility(View.VISIBLE);
+                                recyclerView.setVisibility(View.GONE);
+                            }
+                        })
+                        .setNegativeButton("Tidak", (dialog, which) -> dialog.dismiss())
+                        .show();
+            });
+
+            holder.switchAktif.setChecked(true); // Default aktif
+        }
+
+        @Override
+        public int getItemCount() {
+            return listJadwal.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            TextView txtJudul, txtJam;
+            ImageView btnDelete;
+            Switch switchAktif;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                txtJudul = itemView.findViewById(R.id.txtJudul);
+                txtJam = itemView.findViewById(R.id.txtJam);
+                btnDelete = itemView.findViewById(R.id.btnDelete);
+                switchAktif = itemView.findViewById(R.id.switchAktif);
+            }
+        }
     }
 }

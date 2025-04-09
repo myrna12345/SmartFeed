@@ -21,6 +21,10 @@ public class ActivityLogin extends AppCompatActivity {
     private ImageView ivTogglePassword;
     private boolean isPasswordVisible = false;
 
+    // Email & Password yang valid
+    private final String validEmail = "azmi@gmail.com";
+    private final String validPassword = "azmi12345";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,15 +46,14 @@ public class ActivityLogin extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Menangani toggle password visibility
+        // Toggle visibilitas password
         ivTogglePassword.setOnClickListener(view -> togglePasswordVisibility());
 
-        // Memeriksa input otomatis untuk validasi tombol login
+        // Validasi input email dan password agar tombol aktif
         etEmail.addTextChangedListener(loginTextWatcher);
         etPassword.addTextChangedListener(loginTextWatcher);
     }
 
-    // Validasi Login
     private void validateLogin() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -73,15 +76,16 @@ public class ActivityLogin extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
-
-        // Pindah ke halaman utama (ubah jika ada halaman lain)
-        Intent intent = new Intent(ActivityLogin.this, DashboardActivity.class); // ganti MainActivity jika perlu
-        startActivity(intent);
-        finish();
+        // Validasi terhadap email & password yang ditentukan
+        if (email.equals(validEmail) && password.equals(validPassword)) {
+            Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ActivityLogin.this, DashboardActivity.class));
+            finish();
+        } else {
+            Toast.makeText(this, "Email atau Kata Sandi salah", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    // Toggle visibilitas password
     private void togglePasswordVisibility() {
         if (isPasswordVisible) {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -94,7 +98,6 @@ public class ActivityLogin extends AppCompatActivity {
         isPasswordVisible = !isPasswordVisible;
     }
 
-    // Mengaktifkan tombol login hanya jika email & password sudah diisi
     private final TextWatcher loginTextWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}

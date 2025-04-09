@@ -17,7 +17,7 @@
             android:name=".LihatprofilActivity"
             android:exported="false" />
         <activity
-            android:name=".Edit_profil"
+            android:name=".EditProfilActivity"
             android:exported="false" /> <!-- Activity Dashboard -->
         <activity
             android:name=".DashboardActivity"

@@ -38,7 +38,6 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground" />
 
-
         <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -51,7 +50,6 @@
         android:layout_height="250dp"
         android:layout_marginBottom="16dp">
 
-        <!-- Progress -->
         <ProgressBar
             android:id="@+id/progress_pakan"
             style="?android:attr/progressBarStyleHorizontal"
@@ -62,7 +60,6 @@
             android:progress="20"
             android:progressDrawable="@drawable/circular_progress_blue" />
 
-        <!-- Logo di tengah -->
         <ImageView
             android:layout_width="250dp"
             android:layout_height="wrap_content"
@@ -79,7 +76,6 @@
             android:outlineProvider="background" />
     </FrameLayout>
 
-    <!-- Persentase -->
     <TextView
         android:id="@+id/tv_persen"
         android:layout_width="wrap_content"
@@ -97,7 +93,6 @@
         android:textColor="#333333"
         android:layout_marginBottom="20dp" />
 
-    <!-- Tombol Atur Jadwal -->
     <Button
         android:id="@+id/btnAturJadwal"
         android:layout_width="match_parent"
@@ -111,7 +106,6 @@
         android:drawablePadding="16dp"
         android:paddingStart="16dp"/>
 
-    <!-- Tombol Lihat Jadwal -->
     <Button
         android:id="@+id/btnLihatJadwal"
         android:layout_width="match_parent"
@@ -124,7 +118,6 @@
         android:drawableStart="@drawable/ic_list"
         android:paddingStart="16dp" />
 
-    <!-- Tombol Jadwal Berikutnya -->
     <Button
         android:id="@+id/btn_next_schedule"
         android:layout_width="match_parent"
@@ -137,4 +130,22 @@
         android:drawableStart="@drawable/ic_calendar"
         android:paddingStart="16dp"
         android:text="Jadwal yang akan datang:\n12:00" />
+
+    <!-- Tambahan RecyclerView dan Tombol Kembali -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewJadwal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnKembaliLihatJadwal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Kembali"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" />
+
 </LinearLayout>

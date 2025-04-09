@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DashboardActivity extends AppCompatActivity {
 
     private ProgressBar progressBarPakan;
-    private TextView tvPersen;
+    private TextView tvPersen, tvNamaPengguna;
     private Button btnAturJadwal, btnLihatJadwal, btnNextSchedule;
 
     @Override
@@ -22,6 +22,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Inisialisasi komponen UI
         progressBarPakan = findViewById(R.id.progress_pakan);
         tvPersen = findViewById(R.id.tv_persen);
+        tvNamaPengguna = findViewById(R.id.tvNamaPengguna); // <-- Tambahan
         btnAturJadwal = findViewById(R.id.btnAturJadwal);
         btnLihatJadwal = findViewById(R.id.btnLihatJadwal);
         btnNextSchedule = findViewById(R.id.btn_next_schedule);
@@ -45,6 +46,12 @@ public class DashboardActivity extends AppCompatActivity {
         // Event tombol Lihat Jadwal
         btnLihatJadwal.setOnClickListener(v -> {
             Intent intent = new Intent(DashboardActivity.this, LihatJadwalActivity.class);
+            startActivity(intent);
+        });
+
+        // Event klik "Hai, Azmi!" untuk buka halaman profil
+        tvNamaPengguna.setOnClickListener(view -> {
+            Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class); // Ganti dengan nama Activity profil kamu
             startActivity(intent);
         });
     }

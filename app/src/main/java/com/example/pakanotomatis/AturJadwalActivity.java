@@ -1,60 +1,58 @@
 package com.example.pakanotomatis;
 
-import android.app.TimePickerDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Calendar;
-
 public class AturJadwalActivity extends AppCompatActivity {
 
     EditText edtJudul;
-    TextView txtJam;
-    String jamDipilih = "00:00";
+    TimePicker timePicker;
     DatabaseHelper db;
-    Button btnKembali;
+    ImageView btnKembali;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_atur_jadwal);
 
-        // Inisialisasi komponen UI
+        // Inisialisasi komponen
         edtJudul = findViewById(R.id.edtJudul);
-        txtJam = findViewById(R.id.txtJam);
-        Button btnPilihJam = findViewById(R.id.btnPilihJam);
+        timePicker = findViewById(R.id.timePicker);
         Button btnSimpan = findViewById(R.id.btnSimpan);
-        btnKembali = findViewById(R.id.btnKembali); // Tombol Kembali
+        btnKembali = findViewById(R.id.btnKembali);
 
         db = new DatabaseHelper(this);
 
-        // Fungsi untuk memilih jam
-        btnPilihJam.setOnClickListener(v -> {
-            Calendar calendar = Calendar.getInstance();
-            new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-                jamDipilih = String.format("%02d:%02d", hourOfDay, minute);
-                txtJam.setText(jamDipilih);
-            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
-        });
-
-        // Fungsi untuk menyimpan jadwal
+        // Simpan data jadwal saat tombol ditekan
         btnSimpan.setOnClickListener(v -> {
-            String judul = edtJudul.getText().toString();
+            String judul = edtJudul.getText().toString().trim();
+            int jam = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                jam = timePicker.getHour();
+            }
+            int menit = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                menit = timePicker.getMinute();
+            }
+            String jamDipilih = String.format("%02d:%02d", jam, menit);
+
             if (!judul.isEmpty()) {
                 db.insertJadwal(judul, jamDipilih);
                 Toast.makeText(this, "Jadwal disimpan", Toast.LENGTH_SHORT).show();
-                finish(); // Menutup activity dan kembali ke sebelumnya
+                finish();
             } else {
                 Toast.makeText(this, "Judul tidak boleh kosong", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Fungsi untuk tombol kembali
-        btnKembali.setOnClickListener(v -> onBackPressed()); // Kembali ke activity sebelumnya
+        // Tombol kembali
+        btnKembali.setOnClickListener(v -> finish());
     }
 }
