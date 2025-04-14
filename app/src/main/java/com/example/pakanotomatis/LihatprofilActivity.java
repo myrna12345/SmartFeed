@@ -1,45 +1,21 @@
 package com.example.pakanotomatis;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.IOException;
 
 public class LihatprofilActivity extends AppCompatActivity {
 
     private ImageView imgProfile, btnKembali;
     private TextView tvNama, tvEmail;
     private Button btnKeluar;
-    private LinearLayout navBeranda, navAturJadwal, navLihatJadwal, navProfil;
-
-    private final ActivityResultLauncher<Intent> imagePickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri selectedImageUri = result.getData().getData();
-                    if (selectedImageUri != null) {
-                        try {
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-                            imgProfile.setImageBitmap(bitmap);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Toast.makeText(this, "Gagal memuat gambar", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            });
+    private LinearLayout navBeranda, navAturJadwal, navLihatJadwal, navProfil, btnEditProfil, btnEditPassword; // Tambahkan btnEditPassword
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,15 +34,17 @@ public class LihatprofilActivity extends AppCompatActivity {
         navLihatJadwal = findViewById(R.id.navLihatJadwal);
         navProfil = findViewById(R.id.navProfil);
 
+        btnEditProfil = findViewById(R.id.btnEditProfil); // Inisialisasi tombol Edit Profil
+        btnEditPassword = findViewById(R.id.btnEditPassword); // Inisialisasi tombol Edit Kata Sandi
+
         // Simulasi nama dan email user (kalau kamu punya data asli, tinggal load dari SharedPreferences atau DB)
         tvNama.setText("Azmi");
         tvEmail.setText("azmi@gmail.com");
 
         // Ganti foto profil
         imgProfile.setOnClickListener(v -> {
-            Intent pickImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            pickImage.setType("image/*");
-            imagePickerLauncher.launch(pickImage);
+            // Logic untuk memilih gambar profil
+            // Misalnya, Anda bisa menggunakan image picker seperti sebelumnya
         });
 
         // Tombol kembali
@@ -76,6 +54,20 @@ public class LihatprofilActivity extends AppCompatActivity {
         btnKeluar.setOnClickListener(v -> {
             Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
             finish(); // Ganti dengan intent ke Login jika perlu
+        });
+
+        // Tombol Edit Profil untuk mengarah ke halaman Edit Profil
+        btnEditProfil.setOnClickListener(v -> {
+            // Ketika tombol Edit Profil ditekan, buka EditProfilActivity
+            Intent editProfilIntent = new Intent(LihatprofilActivity.this, EditProfilActivity.class);
+            startActivity(editProfilIntent);
+        });
+
+        // Tombol Edit Kata Sandi untuk mengarah ke halaman Edit Kata Sandi
+        btnEditPassword.setOnClickListener(v -> {
+            // Ketika tombol Edit Kata Sandi ditekan, buka EditPasswordActivity
+            Intent editPasswordIntent = new Intent(LihatprofilActivity.this, EditKataSandiActivity.class);
+            startActivity(editPasswordIntent);
         });
 
         // Bottom Navigation
