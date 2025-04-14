@@ -3,6 +3,7 @@ package com.example.pakanotomatis;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,7 +28,10 @@ public class LihatJadwalActivity extends AppCompatActivity {
     DatabaseHelper db;
     ArrayList<Jadwal> daftarJadwal;
     ImageView btnKembali;
-    TextView tvKosong; // Tambahkan variabel untuk TextView jadwal kosong
+    TextView tvKosong;
+
+    // 👇 Tambahan: komponen navigasi bawah
+    LinearLayout navBeranda, navAturJadwal, navLihatJadwal, navProfil;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -37,7 +42,33 @@ public class LihatJadwalActivity extends AppCompatActivity {
         // Inisialisasi View
         recyclerView = findViewById(R.id.recyclerViewJadwal);
         btnKembali = findViewById(R.id.btnKembali);
-        tvKosong = findViewById(R.id.tvKosong); // Inisialisasi TextView
+        tvKosong = findViewById(R.id.tvKosong);
+
+        // 🔧 Inisialisasi Bottom Navigation
+        navBeranda = findViewById(R.id.navBeranda);
+        navAturJadwal = findViewById(R.id.navAturJadwal);
+        navLihatJadwal = findViewById(R.id.navLihatJadwal);
+        navProfil = findViewById(R.id.navProfil);
+
+        // 🔄 Set klik navigasi
+        navBeranda.setOnClickListener(v -> {
+            startActivity(new Intent(this, DashboardActivity.class));
+            finish();
+        });
+
+        navAturJadwal.setOnClickListener(v -> {
+            startActivity(new Intent(this, AturJadwalActivity.class));
+            finish();
+        });
+
+        navLihatJadwal.setOnClickListener(v -> {
+            // Sudah di halaman ini, jadi tidak perlu pindah
+        });
+
+        navProfil.setOnClickListener(v -> {
+            startActivity(new Intent(this, LihatprofilActivity.class));
+            finish();
+        });
 
         // Inisialisasi database dan data
         db = new DatabaseHelper(this);
@@ -57,13 +88,8 @@ public class LihatJadwalActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Fungsi klik tombol panah kembali
-        btnKembali.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // kembali ke activity sebelumnya
-            }
-        });
+        // Tombol kembali
+        btnKembali.setOnClickListener(v -> finish());
     }
 
     // ============================================
@@ -102,7 +128,7 @@ public class LihatJadwalActivity extends AppCompatActivity {
                             notifyItemRemoved(position);
                             Toast.makeText(context, "Jadwal dihapus", Toast.LENGTH_SHORT).show();
 
-                            // Perbarui tampilan jika kosong
+                            // Update tampilan jika kosong
                             if (listJadwal.isEmpty()) {
                                 tvKosong.setVisibility(View.VISIBLE);
                                 recyclerView.setVisibility(View.GONE);
@@ -112,7 +138,7 @@ public class LihatJadwalActivity extends AppCompatActivity {
                         .show();
             });
 
-            holder.switchAktif.setChecked(true); // Default aktif
+            holder.switchAktif.setChecked(true);
         }
 
         @Override

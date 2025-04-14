@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pakan Otomatis</string>
+    <string name="app_name">Smart Feed</string>
     <string name="hint_nama">Nama Lengkap</string>
     <string name="hint_email">Email</string>
     <string name="hint_no_telepon">No. Telepon</string>

@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,12 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 public class DashboardActivity extends AppCompatActivity {
 
     private ProgressBar progressBarPakan;
-    private TextView tvPersen, tvNamaPengguna;
-    private Button btnAturJadwal, btnLihatJadwal, btnNextSchedule;
-
-    private ImageView iconNotifikasi, btnTutupNotifikasi;
-    private RelativeLayout layoutNotifikasi;
-    private TextView badgeNotifikasi;
+    private TextView tvPersen, tvNamaPengguna, badgeNotifikasi;
+    private Button btnNextSchedule;
+    private ImageView iconNotifikasi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +27,8 @@ public class DashboardActivity extends AppCompatActivity {
         progressBarPakan = findViewById(R.id.progress_pakan);
         tvPersen = findViewById(R.id.tv_persen);
         tvNamaPengguna = findViewById(R.id.tvNamaPengguna);
-        btnAturJadwal = findViewById(R.id.btnAturJadwal);
-        btnLihatJadwal = findViewById(R.id.btnLihatJadwal);
         btnNextSchedule = findViewById(R.id.btn_next_schedule);
-
-        // Notifikasi
         iconNotifikasi = findViewById(R.id.iconNotifikasi);
-        layoutNotifikasi = findViewById(R.id.layoutNotifikasi);
-        btnTutupNotifikasi = findViewById(R.id.btnTutupNotifikasi);
         badgeNotifikasi = findViewById(R.id.badgeNotifikasi);
 
         // Ambil data dari sensor (sementara dummy)
@@ -58,33 +49,39 @@ public class DashboardActivity extends AppCompatActivity {
             badgeNotifikasi.setVisibility(View.GONE);
         }
 
-        // Notifikasi hanya muncul saat ikon diklik
-        iconNotifikasi.setOnClickListener(v -> {
-            layoutNotifikasi.setVisibility(View.VISIBLE);
-            badgeNotifikasi.setVisibility(View.GONE); // Sembunyikan badge saat dibuka
-        });
-
-        // Tutup notifikasi saat tombol X ditekan
-        btnTutupNotifikasi.setOnClickListener(v -> layoutNotifikasi.setVisibility(View.GONE));
-
-        // Tombol ke halaman Atur Jadwal
-        btnAturJadwal.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, AturJadwalActivity.class);
-            startActivity(intent);
-        });
-
-        // Tombol ke halaman Lihat Jadwal
-        btnLihatJadwal.setOnClickListener(v -> {
-            Intent intent = new Intent(DashboardActivity.this, LihatJadwalActivity.class);
-            startActivity(intent);
-        });
+        // Klik ikon notifikasi
+        iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
 
         // Klik nama pengguna ke halaman profil
         tvNamaPengguna.setOnClickListener(view -> {
             Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class);
             startActivity(intent);
         });
+
+        // Bottom navigation click handling
+        setupBottomNav();
     }
+
+    private void setupBottomNav() {
+        LinearLayout bottomNav = findViewById(R.id.bottomNavigationView);
+
+        LinearLayout navAturJadwal = (LinearLayout) bottomNav.getChildAt(1);
+        LinearLayout navLihatJadwal = (LinearLayout) bottomNav.getChildAt(2);
+        LinearLayout navProfil = (LinearLayout) bottomNav.getChildAt(3);
+
+        navAturJadwal.setOnClickListener(v -> {
+            startActivity(new Intent(this, AturJadwalActivity.class));
+        });
+
+        navLihatJadwal.setOnClickListener(v -> {
+            startActivity(new Intent(this, LihatJadwalActivity.class));
+        });
+
+        navProfil.setOnClickListener(v -> {
+            startActivity(new Intent(this, LihatprofilActivity.class));
+        });
+    }
+
 
     // Dummy method ambil data sensor
     private int getSensorData() {
