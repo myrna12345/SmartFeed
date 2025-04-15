@@ -50,11 +50,14 @@ public class LihatprofilActivity extends AppCompatActivity {
         // Tombol kembali
         btnKembali.setOnClickListener(v -> finish());
 
-        // Tombol keluar
         btnKeluar.setOnClickListener(v -> {
             Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
-            finish(); // Ganti dengan intent ke Login jika perlu
+            Intent intent = new Intent(this, ActivityLogin.class); // Ganti dengan activity login Anda
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK); // Menambahkan flag agar halaman login muncul di stack dan menghapus aktivitas sebelumnya
+            startActivity(intent);
+            finish(); // Menutup aktivitas saat ini
         });
+
 
         // Tombol Edit Profil untuk mengarah ke halaman Edit Profil
         btnEditProfil.setOnClickListener(v -> {
