@@ -8,7 +8,7 @@
     android:background="@drawable/bg_gradient"
     tools:context=".ActivityLogin">
 
-    <!-- Image View for Logo -->
+    <!-- Logo -->
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="300dp"
@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="50dp" />
 
-    <!-- CardView untuk Form Login -->
+    <!-- CardView Form Login -->
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -38,14 +38,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Judul "Masuk" -->
+            <!-- Judul Masuk -->
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:paddingBottom="25dp"
-                android:text=" Masuk"
+                android:text="Masuk"
                 android:textColor="@android:color/black"
-                android:textSize="18dp"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
             <!-- Input Email -->
@@ -55,16 +56,17 @@
                 android:layout_height="45dp"
                 android:background="@drawable/edittext_border_selector"
                 android:hint="Email"
-                android:padding="12dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/black"
-                android:drawablePadding="12dp"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Input Kata Sandi dengan Ikon Mata -->
+            <!-- Input Kata Sandi + Ikon Mata -->
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp">
 
                 <EditText
                     android:id="@+id/et_password"
@@ -72,11 +74,10 @@
                     android:layout_height="45dp"
                     android:background="@drawable/edittext_border_selector"
                     android:hint="Kata Sandi"
-                    android:padding="12dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="48dp"
                     android:inputType="textPassword"
-                    android:textColor="@android:color/black"
-                    android:drawablePadding="12dp"
-                    android:layout_marginBottom="12dp"/>
+                    android:textColor="@android:color/black" />
 
                 <ImageView
                     android:id="@+id/iv_toggle_password"
@@ -87,7 +88,7 @@
                     android:contentDescription="Toggle Password"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="10dp"/>
+                    android:layout_marginEnd="4dp"/>
             </RelativeLayout>
 
             <!-- Lupa Kata Sandi -->
