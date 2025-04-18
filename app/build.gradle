@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
+    id 'com.google.gms.google-services' // Ini penting untuk Firebase
 }
+
 
 android {
     namespace 'com.example.pakanotomatis'
@@ -29,7 +31,13 @@ android {
 }
 
 dependencies {
+    // Firebase Authentication
+    implementation 'com.google.firebase:firebase-auth:21.0.7'  // Tambahkan ini
 
+    // Firebase Core (Jika perlu, untuk analytics dan lainnya)
+    implementation 'com.google.firebase:firebase-analytics:21.1.0'  // Ini opsional jika membutuhkan analytics
+
+    // Dependensi lainnya (seperti appcompat, material, dll.)
     implementation libs.appcompat
     implementation libs.material
     implementation libs.activity
