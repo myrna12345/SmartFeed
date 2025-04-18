@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "312684452851",
+    "project_id": "pakan-otomatis-f1dd8",
+    "storage_bucket": "pakan-otomatis-f1dd8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:312684452851:android:f6e8661224be74763bd086",
+        "android_client_info": {
+          "package_name": "com.example.pakanotomatis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALSbG1ZUq1MhJyUCzOgsghTd--X7GEQZE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
