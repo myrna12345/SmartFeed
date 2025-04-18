@@ -11,7 +11,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ActivityLogin extends AppCompatActivity {
 
@@ -21,14 +25,16 @@ public class ActivityLogin extends AppCompatActivity {
     private ImageView ivTogglePassword;
     private boolean isPasswordVisible = false;
 
-    // Email & Password yang valid
-    private final String validEmail = "azmi@gmail.com";
-    private final String validPassword = "azmi12345";
+    // Inisialisasi FirebaseAuth
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Inisialisasi FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
 
         // Inisialisasi komponen UI
         etEmail = findViewById(R.id.et_email);
@@ -76,14 +82,20 @@ public class ActivityLogin extends AppCompatActivity {
             return;
         }
 
-        // Validasi terhadap email & password yang ditentukan
-        if (email.equals(validEmail) && password.equals(validPassword)) {
-            Toast.makeText(this, "Login Berhasil", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(ActivityLogin.this, DashboardActivity.class));
-            finish();
-        } else {
-            Toast.makeText(this, "Email atau Kata Sandi salah", Toast.LENGTH_SHORT).show();
-        }
+        // Login menggunakan Firebase Authentication
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Login berhasil
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Toast.makeText(ActivityLogin.this, "Login Berhasil", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(ActivityLogin.this, DashboardActivity.class));
+                        finish();
+                    } else {
+                        // Login gagal
+                        Toast.makeText(ActivityLogin.this, "Email atau Kata Sandi salah", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void togglePasswordVisibility() {
