@@ -9,7 +9,14 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -31,26 +38,8 @@ public class DashboardActivity extends AppCompatActivity {
         iconNotifikasi = findViewById(R.id.iconNotifikasi);
         badgeNotifikasi = findViewById(R.id.badgeNotifikasi);
 
-        // Ambil data dari sensor (sementara dummy)
-        int sisaPakanPersen = getSensorData();
-
-        // Tampilkan data progress
-        progressBarPakan.setProgress(sisaPakanPersen);
-        tvPersen.setText(sisaPakanPersen + " %");
-
-        // Update tombol jadwal berikutnya
+        // Jadwal dummy
         btnNextSchedule.setText("Jadwal yang akan datang:\n12:00");
-
-        // Tampilkan badge jika sisa pakan di bawah 30%
-        if (sisaPakanPersen < 30) {
-            badgeNotifikasi.setVisibility(View.VISIBLE);
-            badgeNotifikasi.setText("1");
-        } else {
-            badgeNotifikasi.setVisibility(View.GONE);
-        }
-
-        // Klik ikon notifikasi
-        iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
 
         // Klik nama pengguna ke halaman profil
         tvNamaPengguna.setOnClickListener(view -> {
@@ -58,8 +47,49 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Bottom navigation click handling
+        // Klik notifikasi untuk menyembunyikan badge
+        iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
+
+        // Ambil data pakan dari Firebase Realtime Database (region asia-southeast1)
+        ambilDataPakanDariFirebase();
+
+        // Bottom navigation
         setupBottomNav();
+    }
+
+    private void ambilDataPakanDariFirebase() {
+        DatabaseReference sensorRef = FirebaseDatabase
+                .getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("Sensor");
+
+        sensorRef.child("pakan_persentase").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Integer persen = snapshot.getValue(Integer.class);
+                    if (persen != null) {
+                        updateProgressUI(persen);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Log atau tampilkan pesan error jika diperlukan
+            }
+        });
+    }
+
+    private void updateProgressUI(int persen) {
+        progressBarPakan.setProgress(persen);
+        tvPersen.setText(persen + " %");
+
+        if (persen < 30) {
+            badgeNotifikasi.setVisibility(View.VISIBLE);
+            badgeNotifikasi.setText("1");
+        } else {
+            badgeNotifikasi.setVisibility(View.GONE);
+        }
     }
 
     private void setupBottomNav() {
@@ -69,22 +99,16 @@ public class DashboardActivity extends AppCompatActivity {
         LinearLayout navLihatJadwal = (LinearLayout) bottomNav.getChildAt(2);
         LinearLayout navProfil = (LinearLayout) bottomNav.getChildAt(3);
 
-        navAturJadwal.setOnClickListener(v -> {
-            startActivity(new Intent(this, AturJadwalActivity.class));
-        });
+        navAturJadwal.setOnClickListener(v ->
+                startActivity(new Intent(this, AturJadwalActivity.class))
+        );
 
-        navLihatJadwal.setOnClickListener(v -> {
-            startActivity(new Intent(this, LihatJadwalActivity.class));
-        });
+        navLihatJadwal.setOnClickListener(v ->
+                startActivity(new Intent(this, LihatJadwalActivity.class))
+        );
 
-        navProfil.setOnClickListener(v -> {
-            startActivity(new Intent(this, LihatprofilActivity.class));
-        });
-    }
-
-
-    // Dummy method ambil data sensor
-    private int getSensorData() {
-        return 20; // Misalnya pakan tersisa 20%
+        navProfil.setOnClickListener(v ->
+                startActivity(new Intent(this, LihatprofilActivity.class))
+        );
     }
 }

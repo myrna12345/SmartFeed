@@ -1,5 +1,6 @@
 package com.example.pakanotomatis;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -8,6 +9,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.AuthCredential;
 
 public class EditKataSandiActivity extends AppCompatActivity {
 
@@ -48,12 +54,37 @@ public class EditKataSandiActivity extends AppCompatActivity {
             } else if (!sandiBaru.equals(konfirmasiSandi)) {
                 Toast.makeText(this, "Kata sandi baru tidak cocok", Toast.LENGTH_SHORT).show();
             } else {
-                // Logika update kata sandi
-                Toast.makeText(this, "Kata sandi berhasil diubah", Toast.LENGTH_SHORT).show();
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null && user.getEmail() != null) {
+                    AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), sandiLama);
+                    user.reauthenticate(credential)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    user.updatePassword(sandiBaru)
+                                            .addOnCompleteListener(updateTask -> {
+                                                if (updateTask.isSuccessful()) {
+                                                    Toast.makeText(this, "Kata sandi berhasil diubah. Silakan login kembali.", Toast.LENGTH_LONG).show();
+
+                                                    // Logout & arahkan ke login
+                                                    FirebaseAuth.getInstance().signOut();
+                                                    Intent intent = new Intent(EditKataSandiActivity.this, ActivityLogin.class);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    startActivity(intent);
+                                                    finish();
+
+                                                } else {
+                                                    Toast.makeText(this, "Gagal mengubah kata sandi. Coba lagi.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                } else {
+                                    Toast.makeText(this, "Kata sandi lama salah", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
             }
         });
 
-        // Toggle visibility
+        // Toggle visibility untuk setiap field
         ivToggleKataSandiLama.setOnClickListener(v -> togglePasswordVisibility(etKataSandiLama, ivToggleKataSandiLama));
         ivToggleKataSandiBaru.setOnClickListener(v -> togglePasswordVisibility(etKataSandiBaru, ivToggleKataSandiBaru));
         ivToggleKonfirmasiKataSandi.setOnClickListener(v -> togglePasswordVisibility(etKonfirmasiKataSandi, ivToggleKonfirmasiKataSandi));
@@ -63,10 +94,10 @@ public class EditKataSandiActivity extends AppCompatActivity {
         int inputType = editText.getInputType();
         if (inputType == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            toggleIcon.setImageResource(R.drawable.ic_eye_closed); // ganti ke ikon "eye off"
+            toggleIcon.setImageResource(R.drawable.ic_eye_closed); // ikon mata tertutup
         } else {
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            toggleIcon.setImageResource(R.drawable.ic_eye); // kembali ke ikon "eye"
+            toggleIcon.setImageResource(R.drawable.ic_eye); // ikon mata terbuka
         }
         editText.setSelection(editText.getText().length());
     }
