@@ -1,6 +1,5 @@
 package com.example.pakanotomatis;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,38 +18,52 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class LihatJadwalActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     JadwalAdapter adapter;
-    DatabaseHelper db;
-    ArrayList<Jadwal> daftarJadwal;
+    ArrayList<Jadwal> daftarJadwal = new ArrayList<>();
     ImageView btnKembali;
     TextView tvKosong;
 
-    // 👇 Tambahan: komponen navigasi bawah
     LinearLayout navBeranda, navAturJadwal, navLihatJadwal, navProfil;
 
-    @SuppressLint("MissingInflatedId")
+    DatabaseReference dbRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lihat_jadwal);
 
-        // Inisialisasi View
         recyclerView = findViewById(R.id.recyclerViewJadwal);
         btnKembali = findViewById(R.id.btnKembali);
         tvKosong = findViewById(R.id.tvKosong);
 
-        // 🔧 Inisialisasi Bottom Navigation
         navBeranda = findViewById(R.id.navBeranda);
         navAturJadwal = findViewById(R.id.navAturJadwal);
         navLihatJadwal = findViewById(R.id.navLihatJadwal);
         navProfil = findViewById(R.id.navProfil);
 
-        // 🔄 Set klik navigasi
+        dbRef = FirebaseDatabase.getInstance(
+                "https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        ).getReference("jadwal_pemberian_pakan");
+
+        adapter = new JadwalAdapter(this, daftarJadwal);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        ambilDataFirebase();
+
+        btnKembali.setOnClickListener(v -> finish());
+
         navBeranda.setOnClickListener(v -> {
             startActivity(new Intent(this, DashboardActivity.class));
             finish();
@@ -62,39 +75,46 @@ public class LihatJadwalActivity extends AppCompatActivity {
         });
 
         navLihatJadwal.setOnClickListener(v -> {
-            // Sudah di halaman ini, jadi tidak perlu pindah
+            // Halaman saat ini
         });
 
         navProfil.setOnClickListener(v -> {
             startActivity(new Intent(this, LihatprofilActivity.class));
             finish();
         });
-
-        // Inisialisasi database dan data
-        db = new DatabaseHelper(this);
-        daftarJadwal = db.getAllJadwal();
-
-        // Tampilkan/hidden berdasarkan data
-        if (daftarJadwal.isEmpty()) {
-            tvKosong.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else {
-            tvKosong.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
-
-        // Atur RecyclerView
-        adapter = new JadwalAdapter(this, daftarJadwal);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        // Tombol kembali
-        btnKembali.setOnClickListener(v -> finish());
     }
 
-    // ============================================
-    // Inner Class Adapter RecyclerView
-    // ============================================
+    private void ambilDataFirebase() {
+        dbRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                daftarJadwal.clear();
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Jadwal jadwal = data.getValue(Jadwal.class);
+                    if (jadwal != null) {
+                        jadwal.id_jadwal = data.getKey(); // penting agar bisa dihapus dan diupdate
+                        daftarJadwal.add(jadwal);
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+
+                if (daftarJadwal.isEmpty()) {
+                    tvKosong.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    tvKosong.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(LihatJadwalActivity.this, "Gagal mengambil data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     public class JadwalAdapter extends RecyclerView.Adapter<JadwalAdapter.ViewHolder> {
 
         Context context;
@@ -115,30 +135,36 @@ public class LihatJadwalActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Jadwal jadwal = listJadwal.get(position);
-            holder.txtJudul.setText(jadwal.getJudul());
-            holder.txtJam.setText(jadwal.getJam());
+
+            holder.txtJudul.setText(jadwal.judul);
+            holder.txtJam.setText(jadwal.waktu_pakan);
+
+            // Reset listener sebelum set ulang
+            holder.switchAktif.setOnCheckedChangeListener(null);
+            holder.switchAktif.setChecked(Boolean.TRUE.equals(jadwal.aktif)); // aman terhadap null
+
+            holder.switchAktif.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (jadwal.id_jadwal != null) {
+                    dbRef.child(jadwal.id_jadwal).child("aktif").setValue(isChecked)
+                            .addOnSuccessListener(unused -> Toast.makeText(context, "Status diperbarui", Toast.LENGTH_SHORT).show())
+                            .addOnFailureListener(e -> Toast.makeText(context, "Gagal memperbarui status", Toast.LENGTH_SHORT).show());
+                }
+            });
 
             holder.btnDelete.setOnClickListener(v -> {
                 new AlertDialog.Builder(context)
                         .setTitle("Konfirmasi")
-                        .setMessage("Apakah Anda yakin ingin menghapus jadwal ini?")
+                        .setMessage("Yakin ingin menghapus jadwal ini?")
                         .setPositiveButton("Ya", (dialog, which) -> {
-                            db.deleteJadwal(jadwal.getId());
-                            listJadwal.remove(position);
-                            notifyItemRemoved(position);
-                            Toast.makeText(context, "Jadwal dihapus", Toast.LENGTH_SHORT).show();
-
-                            // Update tampilan jika kosong
-                            if (listJadwal.isEmpty()) {
-                                tvKosong.setVisibility(View.VISIBLE);
-                                recyclerView.setVisibility(View.GONE);
+                            if (jadwal.id_jadwal != null) {
+                                dbRef.child(jadwal.id_jadwal).removeValue()
+                                        .addOnSuccessListener(unused -> Toast.makeText(context, "Jadwal dihapus", Toast.LENGTH_SHORT).show())
+                                        .addOnFailureListener(e -> Toast.makeText(context, "Gagal menghapus jadwal", Toast.LENGTH_SHORT).show());
                             }
                         })
                         .setNegativeButton("Tidak", (dialog, which) -> dialog.dismiss())
                         .show();
             });
-
-            holder.switchAktif.setChecked(true);
         }
 
         @Override
@@ -158,6 +184,22 @@ public class LihatJadwalActivity extends AppCompatActivity {
                 btnDelete = itemView.findViewById(R.id.btnDelete);
                 switchAktif = itemView.findViewById(R.id.switchAktif);
             }
+        }
+    }
+
+    public static class Jadwal {
+        public String id_jadwal;
+        public String judul;
+        public String waktu_pakan;
+        public Boolean aktif; // gunakan Boolean (wrapper) agar bisa null-safe
+
+        public Jadwal() {}
+
+        public Jadwal(String id_jadwal, String judul, String waktu_pakan) {
+            this.id_jadwal = id_jadwal;
+            this.judul = judul;
+            this.waktu_pakan = waktu_pakan;
+            this.aktif = true;
         }
     }
 }

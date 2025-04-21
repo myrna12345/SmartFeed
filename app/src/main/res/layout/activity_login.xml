@@ -60,9 +60,7 @@
                 android:paddingEnd="16dp"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="12dp"
-                android:paddingTop="8dp"  <!-- Padding atas untuk jarak lebih baik -->
-            android:paddingBottom="8dp"/> <!-- Padding bawah untuk jarak lebih baik -->
+                android:layout_marginBottom="12dp" />
 
             <!-- Input Kata Sandi + Ikon Mata -->
             <RelativeLayout
@@ -113,8 +111,7 @@
                 android:textSize="16sp"
                 android:backgroundTint="#0D9AFF"
                 android:textColor="@android:color/white"
-                android:layout_marginTop="15dp"
-                android:padding="10dp"/> <!-- Tambahkan padding untuk tombol lebih rapi -->
+                android:layout_marginTop="15dp"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
