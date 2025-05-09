@@ -51,7 +51,6 @@ public class AturJadwalActivity extends AppCompatActivity {
             int jam = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? timePicker.getHour() : timePicker.getCurrentHour();
             int menit = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) ? timePicker.getMinute() : timePicker.getCurrentMinute();
 
-            // Konversi waktu ke zona waktu Makassar (WITA)
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, jam);
             calendar.set(Calendar.MINUTE, menit);
@@ -60,19 +59,20 @@ public class AturJadwalActivity extends AppCompatActivity {
             TimeZone timeZone = TimeZone.getTimeZone("Asia/Makassar");
             calendar.setTimeZone(timeZone);
 
-            // Format waktu yang sudah disesuaikan dengan zona waktu Makassar
+            // Format waktu
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
             sdf.setTimeZone(timeZone);
             String waktu = sdf.format(calendar.getTime());
 
             if (!judul.isEmpty()) {
-                // Koneksi ke Firebase (gunakan URL regional Asia)
                 DatabaseReference dbRef = FirebaseDatabase.getInstance(
                         "https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app/"
                 ).getReference("jadwal_pemberian_pakan");
 
                 String id = dbRef.push().getKey(); // Generate ID unik
-                Jadwal jadwal = new Jadwal(id, judul, waktu);
+
+                // Set aktif = true saat membuat objek Jadwal
+                Jadwal jadwal = new Jadwal(id, judul, waktu, true);
 
                 if (id != null) {
                     dbRef.child(id).setValue(jadwal)
@@ -100,20 +100,22 @@ public class AturJadwalActivity extends AppCompatActivity {
         navProfil.setOnClickListener(v -> startActivity(new Intent(this, LihatprofilActivity.class)));
     }
 
-    // Model data jadwal
+    // Model data jadwal dengan properti aktif
     public static class Jadwal {
         public String id_jadwal;
         public String judul;
         public String waktu_pakan;
+        public boolean aktif;
 
         public Jadwal() {
             // Diperlukan untuk Firebase
         }
 
-        public Jadwal(String id_jadwal, String judul, String waktu_pakan) {
+        public Jadwal(String id_jadwal, String judul, String waktu_pakan, boolean aktif) {
             this.id_jadwal = id_jadwal;
             this.judul = judul;
             this.waktu_pakan = waktu_pakan;
+            this.aktif = aktif;
         }
     }
 }

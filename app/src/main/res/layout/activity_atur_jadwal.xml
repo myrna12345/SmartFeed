@@ -36,7 +36,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Atur Jadwal"
+                    android:text="Atur Jadwal Pemberian Pakan"
                     android:textSize="18sp"
                     android:textColor="@android:color/white"
                     android:textStyle="bold" />
