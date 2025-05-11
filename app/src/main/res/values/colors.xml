@@ -4,4 +4,6 @@
     <color name="white">#FFFFFF</color>
     <color name="blue">#0D9AFF</color>
     <color name="green">#00FF00</color>
+    <color name="text_disabled">#AAAAAA</color> <!-- Warna teks redup -->
+    <color name="bg_disabled">#EEEEEE</color> <!-- Warna background redup -->
 </resources>

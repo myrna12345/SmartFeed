@@ -34,13 +34,30 @@
             android:textColor="@android:color/black"
             android:layout_marginTop="4dp" />
 
-        <Switch
-            android:id="@+id/switchAktif"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aktif"
-            android:textSize="12sp"
-            android:layout_marginTop="8dp" />
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <Switch
+                android:id="@+id/switchAktif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:thumbTint="@color/blue"
+                android:trackTint="@color/white"/>
+
+            <TextView
+                android:id="@+id/tvStatusAktif"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="On"
+                android:textSize="12sp"
+                android:layout_marginLeft="8dp"
+                android:textColor="@android:color/black"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Bagian Kanan: Tombol Hapus -->
