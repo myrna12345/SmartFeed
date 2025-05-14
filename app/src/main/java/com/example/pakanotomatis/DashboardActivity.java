@@ -18,6 +18,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class DashboardActivity extends AppCompatActivity {
 
     private ProgressBar progressBarPakan;
@@ -38,8 +45,8 @@ public class DashboardActivity extends AppCompatActivity {
         iconNotifikasi = findViewById(R.id.iconNotifikasi);
         badgeNotifikasi = findViewById(R.id.badgeNotifikasi);
 
-        // Jadwal dummy
-        btnNextSchedule.setText("Jadwal yang akan datang:\n12:00");
+        // Placeholder awal jadwal
+        btnNextSchedule.setText("Jadwal pemberian pakan terdekat:");
 
         // Klik nama pengguna ke halaman profil
         tvNamaPengguna.setOnClickListener(view -> {
@@ -47,11 +54,13 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Klik notifikasi untuk menyembunyikan badge
+        // Klik ikon notifikasi untuk menyembunyikan badge
         iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
 
-        // Ambil data pakan dari Firebase Realtime Database (region asia-southeast1)
+        // Ambil data dari Firebase
         ambilDataPakanDariFirebase();
+        ambilJadwalAktifTerdekat();
+        ambilNamaPengguna();
 
         // Bottom navigation
         setupBottomNav();
@@ -75,7 +84,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Log atau tampilkan pesan error jika diperlukan
+                // Bisa tampilkan log error jika perlu
             }
         });
     }
@@ -90,6 +99,100 @@ public class DashboardActivity extends AppCompatActivity {
         } else {
             badgeNotifikasi.setVisibility(View.GONE);
         }
+    }
+
+    private void ambilJadwalAktifTerdekat() {
+        DatabaseReference dbRef = FirebaseDatabase
+                .getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("jadwal_pemberian_pakan");
+
+        dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<String> waktuAktifList = new ArrayList<>();
+
+                for (DataSnapshot data : snapshot.getChildren()) {
+                    Boolean aktif = data.child("aktif").getValue(Boolean.class);
+                    String waktu = data.child("waktu_pakan").getValue(String.class);
+
+                    if (aktif != null && aktif && waktu != null) {
+                        waktuAktifList.add(waktu);
+                    }
+                }
+
+                if (waktuAktifList.isEmpty()) {
+                    btnNextSchedule.setText("Belum ada jadwal aktif");
+                    return;
+                }
+
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                Calendar sekarang = Calendar.getInstance();
+
+                String jadwalTerdekat = null;
+                long selisihTerdekat = Long.MAX_VALUE;
+
+                for (String waktu : waktuAktifList) {
+                    try {
+                        Date waktuDate = sdf.parse(waktu);
+                        if (waktuDate != null) {
+                            Calendar jadwalCal = (Calendar) sekarang.clone();
+                            Calendar waktuTarget = Calendar.getInstance();
+                            waktuTarget.setTime(waktuDate);
+
+                            jadwalCal.set(Calendar.HOUR_OF_DAY, waktuTarget.get(Calendar.HOUR_OF_DAY));
+                            jadwalCal.set(Calendar.MINUTE, waktuTarget.get(Calendar.MINUTE));
+                            jadwalCal.set(Calendar.SECOND, 0);
+                            jadwalCal.set(Calendar.MILLISECOND, 0);
+
+                            if (jadwalCal.before(sekarang)) {
+                                jadwalCal.add(Calendar.DAY_OF_MONTH, 1);
+                            }
+
+                            long selisih = jadwalCal.getTimeInMillis() - sekarang.getTimeInMillis();
+
+                            if (selisih < selisihTerdekat) {
+                                selisihTerdekat = selisih;
+                                jadwalTerdekat = waktu;
+                            }
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (jadwalTerdekat != null) {
+                    btnNextSchedule.setText("Jadwal aktif terdekat:\n" + jadwalTerdekat);
+                } else {
+                    btnNextSchedule.setText("Belum ada jadwal aktif hari ini");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                btnNextSchedule.setText("Gagal mengambil jadwal");
+            }
+        });
+    }
+
+    private void ambilNamaPengguna() {
+        DatabaseReference userRef = FirebaseDatabase
+                .getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
+                .getReference("users/user123/nama"); // Ganti 'user123' dengan ID pengguna sebenarnya
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String nama = snapshot.getValue(String.class);
+                    tvNamaPengguna.setText(nama);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle jika gagal mengambil data
+            }
+        });
     }
 
     private void setupBottomNav() {
