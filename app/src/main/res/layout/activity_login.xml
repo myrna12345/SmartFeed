@@ -38,16 +38,21 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Judul Masuk -->
-            <TextView
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingBottom="25dp"
-                android:text="Masuk"
-                android:textColor="@android:color/black"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center"
+                android:padding="10dp">
+                <!-- Judul Masuk -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Masuk"
+                    android:textColor="@android:color/black"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    />
+            </LinearLayout>
 
             <!-- Input Email -->
             <EditText
@@ -60,7 +65,9 @@
                 android:paddingEnd="16dp"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/black"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="12dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"/>
 
             <!-- Input Kata Sandi + Ikon Mata -->
             <RelativeLayout
@@ -77,7 +84,10 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="48dp"
                     android:inputType="textPassword"
-                    android:textColor="@android:color/black" />
+                    android:textColor="@android:color/black"
+
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"/>
 
                 <ImageView
                     android:id="@+id/iv_toggle_password"
@@ -88,7 +98,7 @@
                     android:contentDescription="Toggle Password"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginEnd="4dp"/>
+                    android:layout_marginEnd="10dp"/>
             </RelativeLayout>
 
             <!-- Lupa Kata Sandi -->
@@ -100,7 +110,8 @@
                 android:textSize="14sp"
                 android:textColor="@android:color/holo_blue_dark"
                 android:paddingTop="10dp"
-                android:layout_gravity="end"/>
+                android:layout_gravity="end"
+                android:layout_marginEnd="10dp"/>
 
             <!-- Tombol Masuk -->
             <Button
@@ -111,7 +122,10 @@
                 android:textSize="16sp"
                 android:backgroundTint="#0D9AFF"
                 android:textColor="@android:color/white"
-                android:layout_marginTop="15dp"/>
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
