@@ -137,6 +137,44 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- ✅ Notifikasi Peringatan Pakan -->
+    <RelativeLayout
+        android:id="@+id/notifikasiPakan"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="#03A9F4"
+        android:padding="16dp"
+        android:layout_centerHorizontal="true"
+        android:elevation="8dp"
+        android:visibility="gone"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_warning" />
+
+        <TextView
+            android:id="@+id/tvNotifikasiPakan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Pakan Hampir Habis"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/btnTutupNotifikasi"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Tutup Notifikasi" />
+    </RelativeLayout>
+
     <!-- Bottom Navigation -->
     <LinearLayout
         android:id="@+id/bottomNavigationView"

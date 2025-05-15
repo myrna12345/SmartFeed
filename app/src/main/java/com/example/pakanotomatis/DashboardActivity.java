@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,7 +31,8 @@ public class DashboardActivity extends AppCompatActivity {
     private ProgressBar progressBarPakan;
     private TextView tvPersen, tvNamaPengguna, badgeNotifikasi;
     private Button btnNextSchedule;
-    private ImageView iconNotifikasi;
+    private ImageView iconNotifikasi, btnTutupNotifikasi;
+    private RelativeLayout notifikasiPakan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +46,25 @@ public class DashboardActivity extends AppCompatActivity {
         btnNextSchedule = findViewById(R.id.btn_next_schedule);
         iconNotifikasi = findViewById(R.id.iconNotifikasi);
         badgeNotifikasi = findViewById(R.id.badgeNotifikasi);
+        notifikasiPakan = findViewById(R.id.notifikasiPakan);
+        btnTutupNotifikasi = findViewById(R.id.btnTutupNotifikasi);
 
         // Placeholder awal jadwal
         btnNextSchedule.setText("Jadwal pemberian pakan terdekat:");
 
-        // Klik nama pengguna ke halaman profil
+        // Navigasi ke profil
         tvNamaPengguna.setOnClickListener(view -> {
             Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class);
             startActivity(intent);
         });
 
-        // Klik ikon notifikasi untuk menyembunyikan badge
-        iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
+        // Tampilkan notifikasi saat lonceng ditekan
+        iconNotifikasi.setOnClickListener(v -> notifikasiPakan.setVisibility(View.VISIBLE));
 
-        // Ambil data dari Firebase
+        // Sembunyikan saat tombol tutup ditekan
+        btnTutupNotifikasi.setOnClickListener(v -> notifikasiPakan.setVisibility(View.GONE));
+
+        // Ambil data Firebase
         ambilDataPakanDariFirebase();
         ambilJadwalAktifTerdekat();
         ambilNamaPengguna();
@@ -177,7 +184,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void ambilNamaPengguna() {
         DatabaseReference userRef = FirebaseDatabase
                 .getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("users/user123/nama"); // Ganti 'user123' dengan ID pengguna sebenarnya
+                .getReference("users/user123/nama"); // Ganti 'user123' sesuai ID pengguna
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -190,7 +197,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle jika gagal mengambil data
+                // Handle error
             }
         });
     }
