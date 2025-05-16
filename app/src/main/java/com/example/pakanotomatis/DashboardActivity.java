@@ -1,6 +1,5 @@
 package com.example.pakanotomatis;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +7,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,11 +30,8 @@ public class DashboardActivity extends AppCompatActivity {
     private ProgressBar progressBarPakan;
     private TextView tvPersen, tvNamaPengguna, badgeNotifikasi;
     private Button btnNextSchedule;
-    private ImageView iconNotifikasi, btnTutupNotifikasi;
-    private RelativeLayout notifikasiPakan;
-    private View dimBackground; // Tambahkan ini untuk background redup
+    private ImageView iconNotifikasi;
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,42 +44,20 @@ public class DashboardActivity extends AppCompatActivity {
         btnNextSchedule = findViewById(R.id.btn_next_schedule);
         iconNotifikasi = findViewById(R.id.iconNotifikasi);
         badgeNotifikasi = findViewById(R.id.badgeNotifikasi);
-        notifikasiPakan = findViewById(R.id.notifikasiPakan);
-        btnTutupNotifikasi = findViewById(R.id.btnTutupNotifikasi);
-        dimBackground = findViewById(R.id.dimBackground); // Inisialisasi background redup
 
         // Placeholder awal jadwal
         btnNextSchedule.setText("Jadwal pemberian pakan terdekat:");
 
-        // Navigasi ke profil
+        // Klik nama pengguna ke halaman profil
         tvNamaPengguna.setOnClickListener(view -> {
             Intent intent = new Intent(DashboardActivity.this, LihatprofilActivity.class);
             startActivity(intent);
         });
 
-        // Listener untuk ikon notifikasi
-        iconNotifikasi.setOnClickListener(v -> {
-            if (badgeNotifikasi.getVisibility() == View.VISIBLE) {
-                // Jika badge muncul, tampilkan notifikasi pakan dan background redup, sembunyikan badge
-                notifikasiPakan.setVisibility(View.VISIBLE);
-                dimBackground.setVisibility(View.VISIBLE);
-                badgeNotifikasi.setVisibility(View.GONE);
-            }
-        });
+        // Klik ikon notifikasi untuk menyembunyikan badge
+        iconNotifikasi.setOnClickListener(v -> badgeNotifikasi.setVisibility(View.GONE));
 
-        // Tutup notifikasi saat tombol tutup ditekan
-        btnTutupNotifikasi.setOnClickListener(v -> {
-            notifikasiPakan.setVisibility(View.GONE);
-            dimBackground.setVisibility(View.GONE);
-        });
-
-        // Tutup notifikasi saat background redup ditekan
-        dimBackground.setOnClickListener(v -> {
-            notifikasiPakan.setVisibility(View.GONE);
-            dimBackground.setVisibility(View.GONE);
-        });
-
-        // Ambil data Firebase
+        // Ambil data dari Firebase
         ambilDataPakanDariFirebase();
         ambilJadwalAktifTerdekat();
         ambilNamaPengguna();
@@ -123,14 +96,8 @@ public class DashboardActivity extends AppCompatActivity {
         if (persen < 30) {
             badgeNotifikasi.setVisibility(View.VISIBLE);
             badgeNotifikasi.setText("1");
-            // Jangan tampilkan dimBackground atau notifikasi pakan di sini,
-            // biarkan hanya muncul saat ikon notifikasi ditekan
-            dimBackground.setVisibility(View.GONE);
-            notifikasiPakan.setVisibility(View.GONE);
         } else {
             badgeNotifikasi.setVisibility(View.GONE);
-            dimBackground.setVisibility(View.GONE);
-            notifikasiPakan.setVisibility(View.GONE);
         }
     }
 
@@ -210,7 +177,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void ambilNamaPengguna() {
         DatabaseReference userRef = FirebaseDatabase
                 .getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
-                .getReference("users/user123/nama"); // Ganti 'user123' sesuai ID pengguna
+                .getReference("users/user123/nama"); // Ganti 'user123' dengan ID pengguna sebenarnya
 
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -223,7 +190,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle error
+                // Handle jika gagal mengambil data
             }
         });
     }
