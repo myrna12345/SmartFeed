@@ -7,7 +7,8 @@
     android:padding="12dp"
     android:layout_marginBottom="8dp"
     android:background="@drawable/bg_card_rounded"
-    android:elevation="4dp">
+    android:elevation="4dp"
+    android:layout_margin="16dp">
 
     <!-- Bagian Kiri: Info Jadwal -->
     <LinearLayout

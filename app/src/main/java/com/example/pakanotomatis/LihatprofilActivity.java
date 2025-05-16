@@ -85,13 +85,21 @@ public class LihatprofilActivity extends AppCompatActivity {
         btnKembali.setOnClickListener(v -> finish());
 
         btnKeluar.setOnClickListener(v -> {
-            mAuth.signOut();
-            Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, ActivityLogin.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-            finish();
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Konfirmasi Logout")
+                    .setMessage("Apakah Anda yakin ingin keluar?")
+                    .setPositiveButton("Ya", (dialog, which) -> {
+                        mAuth.signOut();
+                        Toast.makeText(this, "Logout berhasil", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(this, ActivityLogin.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    })
+                    .setNegativeButton("Tidak", null)
+                    .show();
         });
+
 
         btnEditProfil.setOnClickListener(v -> {
             Intent editProfilIntent = new Intent(LihatprofilActivity.this, EditProfilActivity.class);

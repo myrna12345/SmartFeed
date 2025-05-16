@@ -4,6 +4,9 @@
     <color name="white">#FFFFFF</color>
     <color name="blue">#0D9AFF</color>
     <color name="green">#00FF00</color>
-    <color name="text_disabled">#AAAAAA</color> <!-- Warna teks redup -->
+    <color name="text_disabled">#B0B0B0</color> <!-- Abu-abu muda -->
     <color name="bg_disabled">#EEEEEE</color> <!-- Warna background redup -->
+    <color name="delete_circle_gray">#808080</color> <!-- Abu-abu gelap -->
+    <color name="delete_circle_blue">#007ACC</color> <!-- Warna biru untuk ON -->
 </resources>
+

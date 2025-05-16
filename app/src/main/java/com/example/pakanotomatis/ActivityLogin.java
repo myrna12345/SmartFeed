@@ -30,6 +30,17 @@ public class ActivityLogin extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Inisialisasi FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
+
+        // 🔒 Cek apakah user sudah login
+        if (mAuth.getCurrentUser() != null) {
+            // Jika sudah login, langsung ke Dashboard
+            startActivity(new Intent(ActivityLogin.this, DashboardActivity.class));
+            finish(); // Jangan biarkan user kembali ke login
+            return; // Hentikan eksekusi lebih lanjut
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 

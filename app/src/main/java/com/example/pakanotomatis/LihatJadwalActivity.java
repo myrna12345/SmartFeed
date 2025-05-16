@@ -199,21 +199,36 @@ public class LihatJadwalActivity extends AppCompatActivity {
 
         private void updateItemAppearance(ViewHolder holder, boolean isActive) {
             if (isActive) {
-                // Mode ON - warna normal
+                // Mode ON
+                holder.itemView.setBackgroundResource(R.drawable.bg_card_rounded);
                 holder.txtJudul.setTextColor(ContextCompat.getColor(context, android.R.color.black));
                 holder.txtJam.setTextColor(ContextCompat.getColor(context, android.R.color.black));
                 holder.tvStatusAktif.setText("On");
                 holder.tvStatusAktif.setTextColor(ContextCompat.getColor(context, R.color.blue));
-                holder.itemView.setBackgroundResource(R.drawable.bg_card_rounded);
+
+                // Background bulat biru untuk tombol hapus
+                holder.btnDelete.setBackgroundResource(R.drawable.bg_delete_circle_blue);
+
+                // Switch aktif berwarna biru
+                holder.switchAktif.setThumbTintList(ContextCompat.getColorStateList(context, R.color.blue));
+                holder.switchAktif.setTrackTintList(ContextCompat.getColorStateList(context, R.color.blue));
             } else {
-                // Mode OFF - warna redup
+                // Mode OFF
+                holder.itemView.setBackgroundResource(R.drawable.bg_card_off);
                 holder.txtJudul.setTextColor(ContextCompat.getColor(context, R.color.text_disabled));
                 holder.txtJam.setTextColor(ContextCompat.getColor(context, R.color.text_disabled));
                 holder.tvStatusAktif.setText("Off");
                 holder.tvStatusAktif.setTextColor(ContextCompat.getColor(context, R.color.text_disabled));
-                holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.bg_disabled));
+
+                // Background bulat abu-abu untuk tombol hapus
+                holder.btnDelete.setBackgroundResource(R.drawable.bg_delete_circle_gray);
+
+                // Switch non-aktif berwarna abu-abu
+                holder.switchAktif.setThumbTintList(ContextCompat.getColorStateList(context, R.color.text_disabled));
+                holder.switchAktif.setTrackTintList(ContextCompat.getColorStateList(context, R.color.text_disabled));
             }
         }
+
 
         @Override
         public int getItemCount() {
