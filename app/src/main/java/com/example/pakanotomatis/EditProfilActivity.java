@@ -67,40 +67,61 @@ public class EditProfilActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
 
         if (user != null) {
-            String email = user.getEmail();
-            String displayName = user.getDisplayName();
+            String uid = user.getUid();
 
-            if (email != null) {
-                editEmail.setText(email);
+            db.collection("users").document(uid)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String nama = documentSnapshot.getString("nama");
+                            String email = documentSnapshot.getString("email");
+                            String telepon = documentSnapshot.getString("telepon");
 
-                if (displayName == null || displayName.isEmpty()) {
-                    String namaDariEmail = email.split("@")[0];
-                    String namaPendek = ambilNamaPendek(namaDariEmail);
-                    String namaFinal = capitalizeFirstLetter(namaPendek);
-                    editName.setText(namaFinal);
+                            if (nama != null) editName.setText(nama);
+                            if (email != null) editEmail.setText(email);
+                            if (telepon != null) editPhone.setText(telepon);
+                        } else {
+                            Toast.makeText(this, "Data tidak ditemukan di Firestore", Toast.LENGTH_SHORT).show();
 
-                    // Set nama default ke Firebase Auth
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(namaFinal)
-                            .build();
+                            // Fallback: gunakan data dari FirebaseAuth
+                            String email = user.getEmail();
+                            String displayName = user.getDisplayName();
 
-                    user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Log.d("EditProfil", "Nama default di-set dari email: " + namaFinal);
+                            if (email != null) {
+                                editEmail.setText(email);
+
+                                if (displayName == null || displayName.isEmpty()) {
+                                    String namaDariEmail = email.split("@")[0];
+                                    String namaPendek = ambilNamaPendek(namaDariEmail);
+                                    String namaFinal = capitalizeFirstLetter(namaPendek);
+                                    editName.setText(namaFinal);
+
+                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(namaFinal)
+                                            .build();
+
+                                    user.updateProfile(profileUpdates)
+                                            .addOnCompleteListener(task -> {
+                                                if (task.isSuccessful()) {
+                                                    Log.d("EditProfil", "Nama default di-set dari email: " + namaFinal);
+                                                }
+                                            });
+                                } else {
+                                    editName.setText(displayName);
                                 }
-                            });
-                } else {
-                    editName.setText(displayName);
-                }
-            }
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Gagal memuat data profil", Toast.LENGTH_SHORT).show();
+                        Log.e("EditProfil", "Gagal ambil data Firestore", e);
+                    });
         } else {
             Toast.makeText(this, "User belum login!", Toast.LENGTH_SHORT).show();
         }
     }
 
     private String ambilNamaPendek(String username) {
-        // Ambil bagian depan dari username
         for (int i = 1; i < username.length(); i++) {
             if (Character.isUpperCase(username.charAt(i))) {
                 return username.substring(0, i);
