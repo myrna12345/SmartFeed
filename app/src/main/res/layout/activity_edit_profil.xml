@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:ignore="ExtraText">
 
     <!-- Header -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -48,7 +49,6 @@
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Foto Profil Lingkaran -->
     <ImageView
         android:id="@+id/profile_image"
         android:layout_width="120dp"
@@ -56,10 +56,8 @@
         android:layout_marginTop="32dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_user_default"
-        android:clipToOutline="true"
-        android:outlineProvider="background"
-        android:background="@drawable/bg_circle_white"
-        app:layout_constraintTop_toBottomOf="@id/header_container"
+        android:background="@drawable/bg_circle"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

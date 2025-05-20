@@ -1,21 +1,19 @@
 package com.example.pakanotomatis;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Outline;
+import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.util.Patterns;
 import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,12 +25,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EditProfilActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final String PROFILE_IMAGE_NAME = "profile_image.jpg";
 
     private ImageView profileImage;
     private TextView textUbahFoto;
@@ -42,6 +44,7 @@ public class EditProfilActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private ProgressDialog progressDialog;
 
     private Uri selectedImageUri = null;
 
@@ -66,48 +69,27 @@ public class EditProfilActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
-        profileImage.post(() -> {
-            int size = Math.min(profileImage.getWidth(), profileImage.getHeight());
-            profileImage.setClipToOutline(true);
-            profileImage.setOutlineProvider(new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    outline.setOval(0, 0, size, size);
-                }
-            });
-        });
+        progressDialog = new ProgressDialog(this);
     }
 
     private void setupListeners() {
         backHeader.setOnClickListener(v -> finish());
-
         textUbahFoto.setOnClickListener(v -> openImageChooser());
-
         btnSave.setOnClickListener(v -> saveProfile());
     }
 
     private void openImageChooser() {
-        Intent intent = new Intent();
+        Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Pilih Foto"), PICK_IMAGE_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             selectedImageUri = data.getData();
-
-            // Load image dengan Glide dan circle crop
-            Glide.with(this)
-                    .load(selectedImageUri)
-                    .placeholder(R.drawable.ic_user_default)
-                    .error(R.drawable.ic_user_default)
-                    .transform(new CircleCrop())
-                    .into(profileImage);
+            saveImageLocally(selectedImageUri);
         }
     }
 
@@ -117,102 +99,55 @@ public class EditProfilActivity extends AppCompatActivity {
         if (user != null) {
             String uid = user.getUid();
 
-            db.collection("users").document(uid)
-                    .get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot.exists()) {
-                            String nama = documentSnapshot.getString("nama");
-                            String email = documentSnapshot.getString("email");
-                            String telepon = documentSnapshot.getString("telepon");
+            db.collection("users").document(uid).get().addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    editName.setText(documentSnapshot.getString("nama"));
+                    editEmail.setText(documentSnapshot.getString("email"));
+                    editPhone.setText(documentSnapshot.getString("telepon"));
+                }
 
-                            if (nama != null) editName.setText(nama);
-                            if (email != null) editEmail.setText(email);
-                            if (telepon != null) editPhone.setText(telepon);
-
-                            String photoUrl = documentSnapshot.getString("photoUrl");
-                            if (photoUrl != null && !photoUrl.isEmpty()) {
-                                Glide.with(this)
-                                        .load(photoUrl)
-                                        .placeholder(R.drawable.ic_user_default)
-                                        .error(R.drawable.ic_user_default)
-                                        .transform(new CircleCrop())
-                                        .into(profileImage);
-                            } else {
-                                Glide.with(this)
-                                        .load(R.drawable.ic_user_default)
-                                        .transform(new CircleCrop())
-                                        .into(profileImage);
-                            }
-
-                        } else {
-                            Toast.makeText(this, "Data tidak ditemukan di Firestore", Toast.LENGTH_SHORT).show();
-
-                            String email = user.getEmail();
-                            String displayName = user.getDisplayName();
-
-                            if (email != null) {
-                                editEmail.setText(email);
-
-                                if (displayName == null || displayName.isEmpty()) {
-                                    String namaDariEmail = email.split("@")[0];
-                                    String namaPendek = ambilNamaPendek(namaDariEmail);
-                                    String namaFinal = capitalizeFirstLetter(namaPendek);
-                                    editName.setText(namaFinal);
-
-                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                            .setDisplayName(namaFinal)
-                                            .build();
-
-                                    user.updateProfile(profileUpdates)
-                                            .addOnCompleteListener(task -> {
-                                                if (task.isSuccessful()) {
-                                                    Log.d("EditProfil", "Nama default di-set dari email: " + namaFinal);
-                                                }
-                                            });
-                                } else {
-                                    editName.setText(displayName);
-                                }
-                            }
-
-                            Glide.with(this)
-                                    .load(R.drawable.ic_user_default)
-                                    .transform(new CircleCrop())
-                                    .into(profileImage);
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Gagal memuat data profil", Toast.LENGTH_SHORT).show();
-                        Log.e("EditProfil", "Gagal ambil data Firestore", e);
-
-                        Glide.with(this)
-                                .load(R.drawable.ic_user_default)
-                                .transform(new CircleCrop())
-                                .into(profileImage);
-                    });
-        } else {
-            Toast.makeText(this, "User belum login!", Toast.LENGTH_SHORT).show();
-
-            Glide.with(this)
-                    .load(R.drawable.ic_user_default)
-                    .transform(new CircleCrop())
-                    .into(profileImage);
+                File imageFile = new File(getFilesDir(), PROFILE_IMAGE_NAME);
+                if (imageFile.exists()) {
+                    loadProfileImage(imageFile);
+                } else {
+                    loadProfileImage(null);
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "Gagal memuat data", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            });
         }
     }
 
-    private String ambilNamaPendek(String username) {
-        for (int i = 1; i < username.length(); i++) {
-            if (Character.isUpperCase(username.charAt(i))) {
-                return username.substring(0, i);
-            }
-        }
-        return username.length() > 6 ? username.substring(0, 6) : username;
+    private void loadProfileImage(File file) {
+        Glide.with(this)
+                .load(file != null ? file : R.drawable.ic_user_default)
+                .transform(new CircleCrop())
+                .into(profileImage);
     }
 
-    private String capitalizeFirstLetter(String text) {
-        if (text == null || text.isEmpty()) {
-            return text;
+    private void saveImageLocally(Uri imageUri) {
+        progressDialog.setMessage("Menyimpan foto...");
+        progressDialog.show();
+
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
+            File file = new File(getFilesDir(), PROFILE_IMAGE_NAME);
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
+            fos.close();
+
+            progressDialog.dismiss();
+            Toast.makeText(this, "Foto berhasil disimpan", Toast.LENGTH_SHORT).show();
+
+            loadProfileImage(file);
+
+        } catch (IOException e) {
+            progressDialog.dismiss();
+            Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
-        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
     }
 
     private void saveProfile() {
@@ -226,12 +161,12 @@ public class EditProfilActivity extends AppCompatActivity {
         }
 
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Format email tidak valid", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Email tidak valid", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (!Patterns.PHONE.matcher(telepon).matches()) {
-            Toast.makeText(this, "Format no telepon tidak valid", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No. telepon tidak valid", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -241,16 +176,13 @@ public class EditProfilActivity extends AppCompatActivity {
                     .setDisplayName(nama)
                     .build();
 
-            user.updateProfile(profileUpdates)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Log.d("EditProfil", "Display name updated.");
-                            saveToFirestore(user.getUid(), nama, email, telepon);
-                            // TODO: Upload foto ke Firebase Storage dan simpan URL di Firestore jika selectedImageUri != null
-                        } else {
-                            Toast.makeText(this, "Gagal update profil", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    saveToFirestore(user.getUid(), nama, email, telepon);
+                } else {
+                    Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
@@ -260,16 +192,13 @@ public class EditProfilActivity extends AppCompatActivity {
         userMap.put("email", email);
         userMap.put("telepon", telepon);
 
-        db.collection("users")
-                .document(userId)
-                .set(userMap)
+        db.collection("users").document(userId).set(userMap)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Profil berhasil disimpan", Toast.LENGTH_SHORT).show();
-                    Log.d("EditProfil", "Data Firestore berhasil disimpan.");
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Gagal simpan data ke Firestore", Toast.LENGTH_SHORT).show();
-                    Log.e("EditProfil", "Gagal simpan data ke Firestore", e);
+                    Toast.makeText(this, "Gagal menyimpan data", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
                 });
     }
 }
