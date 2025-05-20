@@ -1,8 +1,14 @@
 package com.example.pakanotomatis;
 
+import android.content.Intent;
+import android.graphics.Outline;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.View;
+import android.view.ViewOutlineProvider;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -10,8 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -22,6 +32,8 @@ import java.util.Map;
 
 public class EditProfilActivity extends AppCompatActivity {
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+
     private ImageView profileImage;
     private TextView textUbahFoto;
     private EditText editName, editEmail, editPhone;
@@ -30,6 +42,8 @@ public class EditProfilActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+
+    private Uri selectedImageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +66,49 @@ public class EditProfilActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        profileImage.post(() -> {
+            int size = Math.min(profileImage.getWidth(), profileImage.getHeight());
+            profileImage.setClipToOutline(true);
+            profileImage.setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setOval(0, 0, size, size);
+                }
+            });
+        });
     }
 
     private void setupListeners() {
         backHeader.setOnClickListener(v -> finish());
 
-        textUbahFoto.setOnClickListener(v ->
-                Toast.makeText(this, "Fitur ubah foto belum tersedia", Toast.LENGTH_SHORT).show());
+        textUbahFoto.setOnClickListener(v -> openImageChooser());
 
         btnSave.setOnClickListener(v -> saveProfile());
+    }
+
+    private void openImageChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Pilih Foto"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            selectedImageUri = data.getData();
+
+            // Load image dengan Glide dan circle crop
+            Glide.with(this)
+                    .load(selectedImageUri)
+                    .placeholder(R.drawable.ic_user_default)
+                    .error(R.drawable.ic_user_default)
+                    .transform(new CircleCrop())
+                    .into(profileImage);
+        }
     }
 
     private void loadUserData() {
@@ -80,10 +128,25 @@ public class EditProfilActivity extends AppCompatActivity {
                             if (nama != null) editName.setText(nama);
                             if (email != null) editEmail.setText(email);
                             if (telepon != null) editPhone.setText(telepon);
+
+                            String photoUrl = documentSnapshot.getString("photoUrl");
+                            if (photoUrl != null && !photoUrl.isEmpty()) {
+                                Glide.with(this)
+                                        .load(photoUrl)
+                                        .placeholder(R.drawable.ic_user_default)
+                                        .error(R.drawable.ic_user_default)
+                                        .transform(new CircleCrop())
+                                        .into(profileImage);
+                            } else {
+                                Glide.with(this)
+                                        .load(R.drawable.ic_user_default)
+                                        .transform(new CircleCrop())
+                                        .into(profileImage);
+                            }
+
                         } else {
                             Toast.makeText(this, "Data tidak ditemukan di Firestore", Toast.LENGTH_SHORT).show();
 
-                            // Fallback: gunakan data dari FirebaseAuth
                             String email = user.getEmail();
                             String displayName = user.getDisplayName();
 
@@ -110,14 +173,29 @@ public class EditProfilActivity extends AppCompatActivity {
                                     editName.setText(displayName);
                                 }
                             }
+
+                            Glide.with(this)
+                                    .load(R.drawable.ic_user_default)
+                                    .transform(new CircleCrop())
+                                    .into(profileImage);
                         }
                     })
                     .addOnFailureListener(e -> {
                         Toast.makeText(this, "Gagal memuat data profil", Toast.LENGTH_SHORT).show();
                         Log.e("EditProfil", "Gagal ambil data Firestore", e);
+
+                        Glide.with(this)
+                                .load(R.drawable.ic_user_default)
+                                .transform(new CircleCrop())
+                                .into(profileImage);
                     });
         } else {
             Toast.makeText(this, "User belum login!", Toast.LENGTH_SHORT).show();
+
+            Glide.with(this)
+                    .load(R.drawable.ic_user_default)
+                    .transform(new CircleCrop())
+                    .into(profileImage);
         }
     }
 
@@ -168,6 +246,7 @@ public class EditProfilActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("EditProfil", "Display name updated.");
                             saveToFirestore(user.getUid(), nama, email, telepon);
+                            // TODO: Upload foto ke Firebase Storage dan simpan URL di Firestore jika selectedImageUri != null
                         } else {
                             Toast.makeText(this, "Gagal update profil", Toast.LENGTH_SHORT).show();
                         }
@@ -190,7 +269,7 @@ public class EditProfilActivity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Gagal simpan data ke Firestore", Toast.LENGTH_SHORT).show();
-                    Log.e("EditProfil", "Error saving data", e);
+                    Log.e("EditProfil", "Gagal simpan data ke Firestore", e);
                 });
     }
 }
