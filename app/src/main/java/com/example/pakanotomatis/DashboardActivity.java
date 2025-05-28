@@ -54,7 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
         dimBackground = findViewById(R.id.dimBackground); // Inisialisasi background redup
 
         // Placeholder awal jadwal
-        btnNextSchedule.setText("Jadwal pemberian pakan terdekat:");
+        btnNextSchedule.setText("Jadwal Pemberian Pakan Terdekat:");
 
         // Navigasi ke profil
         tvNamaPengguna.setOnClickListener(view -> {
@@ -194,15 +194,15 @@ public class DashboardActivity extends AppCompatActivity {
                 }
 
                 if (jadwalTerdekat != null) {
-                    btnNextSchedule.setText("Jadwal pemberian Pakan terdekat:\n" + jadwalTerdekat);
+                    btnNextSchedule.setText("Jadwal Pemberian Pakan Terdekat:\n" + jadwalTerdekat);
                 } else {
-                    btnNextSchedule.setText("Belum ada jadwal aktif");
+                    btnNextSchedule.setText("Belum Ada Jadwal Aktif");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                btnNextSchedule.setText("Gagal mengambil jadwal");
+                btnNextSchedule.setText("Gagal Mengambil Jadwal");
             }
         });
     }
