@@ -194,7 +194,7 @@ public class DashboardActivity extends AppCompatActivity {
                 }
 
                 if (jadwalTerdekat != null) {
-                    btnNextSchedule.setText("Jadwal pemberian pakan terdekat:\n" + jadwalTerdekat);
+                    btnNextSchedule.setText("Jadwal pemberian Pakan terdekat:\n" + jadwalTerdekat);
                 } else {
                     btnNextSchedule.setText("Belum ada jadwal aktif");
                 }
