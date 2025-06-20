@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -33,8 +32,8 @@ import java.util.Map;
 
 public class EditProfilActivity extends AppCompatActivity {
 
-    private static final int PICK_IMAGE_REQUEST = 1;
-    private static final String PROFILE_IMAGE_NAME = "profile_image.jpg";
+    private static final int PICK_IMAGE_REQUEST = 100;
+    private static final String PROFILE_IMAGE_NAME = "profile_image.png";
 
     private ImageView profileImage;
     private TextView textUbahFoto;
@@ -89,8 +88,36 @@ public class EditProfilActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             selectedImageUri = data.getData();
-            saveImageLocally(selectedImageUri);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+                saveProfileImageLocally(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
+            }
         }
+    }
+
+    private void saveProfileImageLocally(Bitmap bitmap) {
+        try {
+            FileOutputStream fos = openFileOutput(PROFILE_IMAGE_NAME, MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.close();
+            Toast.makeText(this, "Foto berhasil disimpan", Toast.LENGTH_SHORT).show();
+            loadProfileImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadProfileImage() {
+        File file = new File(getFilesDir(), PROFILE_IMAGE_NAME);
+        Glide.with(this)
+                .load(file.exists() ? file : R.drawable.ic_user_default)
+                .transform(new CircleCrop())
+                .skipMemoryCache(true)
+                .into(profileImage);
     }
 
     private void loadUserData() {
@@ -106,47 +133,11 @@ public class EditProfilActivity extends AppCompatActivity {
                     editPhone.setText(documentSnapshot.getString("telepon"));
                 }
 
-                File imageFile = new File(getFilesDir(), PROFILE_IMAGE_NAME);
-                if (imageFile.exists()) {
-                    loadProfileImage(imageFile);
-                } else {
-                    loadProfileImage(null);
-                }
+                loadProfileImage();
             }).addOnFailureListener(e -> {
                 Toast.makeText(this, "Gagal memuat data", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             });
-        }
-    }
-
-    private void loadProfileImage(File file) {
-        Glide.with(this)
-                .load(file != null ? file : R.drawable.ic_user_default)
-                .transform(new CircleCrop())
-                .into(profileImage);
-    }
-
-    private void saveImageLocally(Uri imageUri) {
-        progressDialog.setMessage("Menyimpan foto...");
-        progressDialog.show();
-
-        try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-
-            File file = new File(getFilesDir(), PROFILE_IMAGE_NAME);
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
-            fos.close();
-
-            progressDialog.dismiss();
-            Toast.makeText(this, "Foto berhasil disimpan", Toast.LENGTH_SHORT).show();
-
-            loadProfileImage(file);
-
-        } catch (IOException e) {
-            progressDialog.dismiss();
-            Toast.makeText(this, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
         }
     }
 
@@ -155,50 +146,70 @@ public class EditProfilActivity extends AppCompatActivity {
         String email = editEmail.getText().toString().trim();
         String telepon = editPhone.getText().toString().trim();
 
-        if (nama.isEmpty() || email.isEmpty() || telepon.isEmpty()) {
-            Toast.makeText(this, "Semua data harus diisi!", Toast.LENGTH_SHORT).show();
+        if (nama.isEmpty()) {
+            editName.setError("Nama tidak boleh kosong");
+            editName.requestFocus();
             return;
         }
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Email tidak valid", Toast.LENGTH_SHORT).show();
+        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editEmail.setError("Email tidak valid");
+            editEmail.requestFocus();
             return;
         }
 
-        if (!Patterns.PHONE.matcher(telepon).matches()) {
-            Toast.makeText(this, "No. telepon tidak valid", Toast.LENGTH_SHORT).show();
+        if (telepon.isEmpty()) {
+            editPhone.setError("Telepon tidak boleh kosong");
+            editPhone.requestFocus();
             return;
         }
+
+        progressDialog.setMessage("Menyimpan data...");
+        progressDialog.show();
 
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(nama)
-                    .build();
+            String uid = user.getUid();
 
-            user.updateProfile(profileUpdates).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    saveToFirestore(user.getUid(), nama, email, telepon);
-                } else {
-                    Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show();
-                }
-            });
+            Map<String, Object> userMap = new HashMap<>();
+            userMap.put("nama", nama);
+            userMap.put("email", email);
+            userMap.put("telepon", telepon);
+
+            db.collection("users").document(uid).set(userMap)
+                    .addOnSuccessListener(aVoid -> {
+                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(nama)
+                                .build();
+                        user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(task -> {
+                                    progressDialog.dismiss();
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(this, "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } else {
+                                        Toast.makeText(this, "Gagal memperbarui profil", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    })
+                    .addOnFailureListener(e -> {
+                        progressDialog.dismiss();
+                        Toast.makeText(this, "Gagal menyimpan data", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    });
         }
     }
 
-    private void saveToFirestore(String userId, String nama, String email, String telepon) {
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("nama", nama);
-        userMap.put("email", email);
-        userMap.put("telepon", telepon);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadProfileImage(); // ⬅️ Refresh gambar setiap kembali ke halaman
+    }
 
-        db.collection("users").document(userId).set(userMap)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Profil berhasil disimpan", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Gagal menyimpan data", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                });
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Glide.get(this).clearMemory();
+        new Thread(() -> Glide.get(this).clearDiskCache()).start(); // Optional, untuk bersihkan cache
     }
 }

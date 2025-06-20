@@ -16,6 +16,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -57,14 +59,14 @@ public class LihatprofilActivity extends AppCompatActivity {
         btnEditProfil = findViewById(R.id.btnEditProfil);
         btnEditPassword = findViewById(R.id.btnEditPassword);
 
-        // Ambil data user dari FirebaseAuth
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             String email = user.getEmail();
             String uid = user.getUid();
 
             tvEmail.setText(email);
-            // Opsional: Ambil nama dari Firebase Realtime Database
+
+            // Bisa load nama dari Firebase Realtime Database jika disimpan
             DatabaseReference userRef = FirebaseDatabase.getInstance("https://pakan-otomatis-f1dd8-default-rtdb.asia-southeast1.firebasedatabase.app")
                     .getReference("pengguna").child(uid);
         } else {
@@ -73,10 +75,8 @@ public class LihatprofilActivity extends AppCompatActivity {
             tvNama.setText("-");
         }
 
-        // Load gambar profil lokal jika ada
         loadProfileImage();
 
-        // Klik gambar untuk memilih gambar baru
         imgProfile.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, PICK_IMAGE);
@@ -100,15 +100,12 @@ public class LihatprofilActivity extends AppCompatActivity {
                     .show();
         });
 
-
         btnEditProfil.setOnClickListener(v -> {
-            Intent editProfilIntent = new Intent(LihatprofilActivity.this, EditProfilActivity.class);
-            startActivity(editProfilIntent);
+            startActivity(new Intent(this, EditProfilActivity.class));
         });
 
         btnEditPassword.setOnClickListener(v -> {
-            Intent editPasswordIntent = new Intent(LihatprofilActivity.this, EditKataSandiActivity.class);
-            startActivity(editPasswordIntent);
+            startActivity(new Intent(this, EditKataSandiActivity.class));
         });
 
         navBeranda.setOnClickListener(v -> {
@@ -132,6 +129,12 @@ public class LihatprofilActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        loadProfileImage(); // ⬅️ Auto-refresh gambar profil setelah kembali
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -140,7 +143,12 @@ public class LihatprofilActivity extends AppCompatActivity {
             try {
                 InputStream inputStream = getContentResolver().openInputStream(imageUri);
                 Bitmap selectedImage = BitmapFactory.decodeStream(inputStream);
-                imgProfile.setImageBitmap(selectedImage);
+
+                Glide.with(this)
+                        .load(imageUri)
+                        .transform(new CircleCrop())
+                        .into(imgProfile);
+
                 saveProfileImage(selectedImage);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -162,8 +170,11 @@ public class LihatprofilActivity extends AppCompatActivity {
         try {
             File file = new File(getFilesDir(), FILENAME);
             if (file.exists()) {
-                Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                imgProfile.setImageBitmap(bitmap);
+                Glide.with(this)
+                        .load(file)
+                        .transform(new CircleCrop())
+                        .skipMemoryCache(true) // ⬅️ agar selalu load ulang
+                        .into(imgProfile);
             }
         } catch (Exception e) {
             e.printStackTrace();
